@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCompany, deleteCompany, addContact, deleteContact, addTool, deleteTool } from '../Backend/controllers/companyController.js';
+import { createCompany, deleteCompany, addContact, deleteContact, addTool, deleteTool } from '../controllers/companyController.js';
 
 const router = express.Router();
 

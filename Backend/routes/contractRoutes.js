@@ -1,5 +1,5 @@
 import express from 'express';
-import { createContract, deleteContract } from '../Backend/controllers/contractController.js';
+import { createContract, deleteContract } from '../controllers/contractController.js';
 
 const router = express.Router();
 

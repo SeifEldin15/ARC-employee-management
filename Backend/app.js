@@ -1,12 +1,15 @@
 import express from 'express';
-import connectDB from './Backend/config/db.js';
+import cron from 'node-cron';
+import connectDB from './config/db.js';
+import Workweek from './models/workweek.js';
+
+
 import authRoutes from './routes/authRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import contractRoutes from './routes/contractRoutes.js';
-import cron from 'node-cron';
-import Workweek from './models/workweek.js'
-import workweekRoutes from './routes/workweekRoutes' ;
-
+import workweekRoutes from './routes/workweekRoutes.js';
+import utilizationRoutes from './routes/utilizationRoutes.js';
+import csrRoutes from './routes/csrRoutes.js';
 
 const app = express();
 app.use(express.json());
@@ -17,9 +20,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/company', companyRoutes);
 app.use('/api/contract', contractRoutes);
 app.use('/api/workweek', workweekRoutes);
-
-
-
+app.use('/api/utilization', utilizationRoutes);
+app.use('/api/csr', csrRoutes);
 
 cron.schedule('0 0 * * 1', async () => {
     const today = new Date();
@@ -42,7 +44,6 @@ cron.schedule('0 0 * * 1', async () => {
     await newWorkweek.save();
     console.log(`New Workweek Created: Week ${weekNumber}`);
 });
-
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

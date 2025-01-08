@@ -1,4 +1,4 @@
-import User from '../../models/User.js' ;
+import User from '../models/User.js' ;
 import jwt from 'jsonwebtoken' ;
 import {JWT_SECRET , NODE_ENV } from '../config/env.js'
 import bcrypt from 'bcrypt' ;
@@ -35,7 +35,7 @@ const login = async (req, res) => {
 };
 
 const registerEmployee = async (req, res) => {
-     
+
     const { name, password, Region, role, job_title, email, phone, manager_id } = req.body;
     if (role !== 'Employee') {
         return res.status(400).json({ message: 'Role must be Employee' });

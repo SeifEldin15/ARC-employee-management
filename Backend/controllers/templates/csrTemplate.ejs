@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSR Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            text-align: center;
+            padding: 8px;
+        }
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .signature {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature div {
+            border-top: 1px solid black;
+            width: 40%;
+            text-align: center;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Customer Service Report (CSR)</h1>
+        <p><b>SPV Number:</b> <%= spvNumber %> | <b>Service Engineer:</b> <%= serviceEngineer %></p>
+        <p><b>Work Week:</b> <%= workWeek %> | <b>Week Ending:</b> <%= weekEndDate %></p>
+    </div>
+
+    <div>
+        <p><b>Customer:</b> <%= customer %></p>
+        <p><b>Address:</b> <%= address %></p>
+        <p><b>Contact:</b> <%= contact %> | <b>Email:</b> <%= email %></p>
+        <p><b>Mobile:</b> <%= mobileNumber %></p>
+        <p><b>Tool Number:</b> <%= toolNumber %> | <b>Job Type:</b> <%= jobType %></p>
+        <p><b>System Type:</b> <%= systemType %> | <b>JIRA Ticket Number:</b> <%= jiraTicketNumber %></p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Travel Hours</th>
+                <th>Regular Hours</th>
+                <th>Overtime Hours</th>
+                <th>Holiday Hours</th>
+                <th>Hourly Rate</th>
+                <th>Total Hours</th>
+                <th>Total USD</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% weeklyTaskReport.forEach(day => { %>
+            <tr>
+                <td><%= day.date %></td>
+                <td><%= day.travelHours || 0 %></td>
+                <td><%= day.regularHours || 0 %></td>
+                <td><%= day.overtimeHours || 0 %></td>
+                <td><%= day.holidayHours || 0 %></td>
+                <td>$<%= day.hourlyRate || 0 %></td>
+                <td><%= day.totalHours || 0 %></td>
+                <td>$<%= day.totalUSD || 0 %></td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <p><b>Total Week Hours:</b> <%= totals.totalWeekHours %> | <b>Total Week USD:</b> $<%= totals.totalWeekUSD %></p>
+
+    <p><b>Purpose of Visit:</b> <%= purposeOfVisit %></p>
+    <p><b>Solution:</b> <%= solution %></p>
+    <p><b>Recommendations:</b> <%= recommendations %></p>
+    <p><b>Additional Notes:</b> <%= additionalNotes %></p>
+    <p><b>Return Visit Required:</b> <%= returnVisitRequired ? 'Yes' : 'No' %></p>
+
+    <div class="signature">
+        <div>Customer Signature</div>
+        <div>Service Engineer Signature</div>
+    </div>
+
+    <div class="footer">
+        <p>Generated on <%= new Date().toDateString() %></p>
+    </div>
+</body>
+</html>

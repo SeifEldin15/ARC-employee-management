@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilization Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Utilization Report Form</h1>
+    <form id="utilization-form">
+        <table id="utilization-table">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>SRV Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Monday</td>
+                    <td><input type="text" name="srv[Monday]" placeholder="SRV #"></td>
+                </tr>
+                <tr>
+                    <td>Tuesday</td>
+                    <td><input type="text" name="srv[Tuesday]" placeholder="SRV #"></td>
+                </tr>
+                <tr>
+                    <td>Wednesday</td>
+                    <td><input type="text" name="srv[Wednesday]" placeholder="SRV #"></td>
+                </tr>
+                <tr>
+                    <td>Thursday</td>
+                    <td><input type="text" name="srv[Thursday]" placeholder="SRV #"></td>
+                </tr>
+                <tr>
+                    <td>Friday</td>
+                    <td><input type="text" name="srv[Friday]" placeholder="SRV #"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" id="add-category">Add Category</button>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        const table = document.getElementById('utilization-table');
+        const addCategoryButton = document.getElementById('add-category');
+
+        // Add a new category column dynamically
+        addCategoryButton.addEventListener('click', () => {
+            const rows = table.rows;
+
+            // Add a new column to the header
+            const headerCell = document.createElement('th');
+            const categoryNumber = rows[0].cells.length - 1; // Adjust for SRV
+            headerCell.textContent = `Category ${categoryNumber}`;
+            rows[0].appendChild(headerCell);
+
+            // Add input fields for each row in the new column
+            for (let i = 1; i < rows.length; i++) {
+                const cell = document.createElement('td');
+                cell.innerHTML = `
+                    <select name="category[${rows[i].cells[0].textContent}][${categoryNumber}]">
+                        <option value="">Select</option>
+                        <option value="1">Category 1</option>
+                        <option value="2">Category 2</option>
+                        <option value="3">Category 3</option>
+                    </select>
+                    <input type="number" name="hours[${rows[i].cells[0].textContent}][${categoryNumber}]" placeholder="Hours" style="width: 70px;">
+                `;
+                rows[i].appendChild(cell);
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('utilization-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            console.log(data);
+
+            // Post data to the server
+            fetch('/submit-utilization', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+                .then(response => response.json())
+                .then(result => alert(result.message))
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

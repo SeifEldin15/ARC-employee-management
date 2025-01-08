@@ -11,7 +11,9 @@ const utilizationSchema = new mongoose.Schema({
             day: String
         }
     ],
-    totalHours: Number
+    totalHours: Number ,
+    pdfPath: String 
+
 });
 
 export default mongoose.model('Utilization', utilizationSchema);

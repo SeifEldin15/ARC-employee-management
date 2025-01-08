@@ -63,6 +63,7 @@ export const submitCSR = async (req, res) => {
             returnVisitRequired
         });
 
+        await csr.save();
 
         // Render HTML template
         const templatePath = path.join(__dirname, '../templates/csrTemplate.ejs');
@@ -97,9 +98,16 @@ export const submitCSR = async (req, res) => {
         await page.pdf({ path: pdfPath, format: 'A4', printBackground: true });
         await browser.close();
 
-
-        csr.pdfPath = pdfPath;
-        await csr.save();
+        // Update Workweek with PDF path
+        const employeeReport = currentWeek.pendingReports.find(report => report.employeeId.toString() === employeeId);
+        if (employeeReport) {
+            const csrReport = employeeReport.reportTypes.find(rt => rt.type === 'CSR');
+            if (csrReport) {
+                csrReport.pdfPath = pdfPath;
+                csrReport.submittedAt = new Date();
+            }
+        }
+        await currentWeek.save();
 
         res.status(200).json({ message: 'CSR submitted successfully!', pdfPath });
     } catch (error) {

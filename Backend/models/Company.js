@@ -13,7 +13,7 @@ const companySchema = new mongoose.Schema({
     ],
     tools: [
         {
-            PNumber: { type: Number, required: true },
+            PNumber: { type: String, required: true },
             toolDescription: { type: String, required: true },
             warrantyStart: { type: Date, required: true },
             warrantyEnd: { type: Date, required: true },

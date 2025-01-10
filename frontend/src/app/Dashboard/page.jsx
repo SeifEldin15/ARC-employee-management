@@ -37,7 +37,7 @@ export default function DashboardPage() {
               color="#2196F3"
             />
           </main>
-          <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-4 p-2 mt-4">
+          <div className="w-full flex flex-col lg:flex-row justify-center items-stretch gap-4 p-2 mt-4">
             <div className="w-full lg:w-1/2">
               <VerticalDistribution />
             </div>

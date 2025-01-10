@@ -36,7 +36,6 @@ export const submitUtilizationReport = async (req, res) => {
             tasks
         });
 
-        // Generate PDF using Puppeteer
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
         await page.setContent(html, { waitUntil: 'domcontentloaded' });
@@ -45,7 +44,6 @@ export const submitUtilizationReport = async (req, res) => {
         await browser.close();
 
 
-         // Update Workweek with PDF path
          const employeeReport = currentWeek.pendingReports.find(report => report.employeeId.toString() === employeeId);
          if (employeeReport) {
              const utilizationReport = employeeReport.reportTypes.find(rt => rt.type === 'Utilization');

@@ -8,8 +8,8 @@ import authRoutes from './routes/authRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import contractRoutes from './routes/contractRoutes.js';
 import workweekRoutes from './routes/workweekRoutes.js';
-import utilizationRoutes from './routes/utilizationRoutes.js';
-import csrRoutes from './routes/csrRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import teamRoutes from './routes/teamRoutes.js';
 
 import managerRoutes from './routes/managerRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
@@ -20,15 +20,16 @@ app.use(express.json());
 connectDB();
 
 app.use('/api/auth', authRoutes);
+app.use('/api/team', teamRoutes);
+app.use('/api/reports', reportRoutes);
 
+app.use('/api/workweek', workweekRoutes);
 app.use('/api/company', companyRoutes);
 app.use('/api/contract', contractRoutes);
-app.use('/api/workweek', workweekRoutes);
-app.use('/api/utilization', utilizationRoutes);
-app.use('/api/csr', csrRoutes);
 
 app.use('/api/manager', managerRoutes);
 app.use('/api/reminder', reminderRoutes);
+
 
 cron.schedule('0 0 * * 1', async () => {
     const today = new Date();

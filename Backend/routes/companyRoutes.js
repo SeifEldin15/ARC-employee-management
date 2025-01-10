@@ -1,13 +1,20 @@
 import express from 'express';
-import { createCompany, deleteCompany, addContact, deleteContact, addTool, deleteTool } from '../controllers/companyController.js';
+import { createCompany, deleteCompany, addContact, deleteContact, addTool, deleteTool, getCompanies, getCompanyDetails, getContacts, getTools } from '../controllers/companyController.js';
 
 const router = express.Router();
 
-router.post('/', createCompany);
-router.delete('/:companyId', deleteCompany);
-router.post('/:companyId/contacts', addContact);
-router.delete('/:companyId/contacts/:contactId', deleteContact);
-router.post('/:companyId/tools', addTool);
-router.delete('/:companyId/tools/:toolId', deleteTool);
+router.get('/', getCompanies);
+router.get('/:companyId/contacts', getContacts);
+router.get('/:companyId/tools', getTools);
+router.get('/:companyId', getCompanyDetails);
+
+router.post('/addCompany', createCompany);
+router.post('/:companyId/addTool', addTool);
+router.post('/:companyId/addContact', addContact);
+
+router.delete('/delete/:companyId', deleteCompany);
+router.delete('/:companyId/deleteContact/:contactId', deleteContact);
+router.delete('/:companyId/deleteTool/:toolId', deleteTool);
 
 export default router; 
+

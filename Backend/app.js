@@ -5,10 +5,12 @@ import Workweek from './models/workweek.js';
 
 
 import authRoutes from './routes/authRoutes.js';
+
+import employeeRoutes from './routes/employeeRoutes.js';
+
 import companyRoutes from './routes/companyRoutes.js';
-import contractRoutes from './routes/contractRoutes.js';
+
 import workweekRoutes from './routes/workweekRoutes.js';
-import reportRoutes from './routes/reportRoutes.js';
 import teamRoutes from './routes/teamRoutes.js';
 
 import managerRoutes from './routes/managerRoutes.js';
@@ -20,14 +22,13 @@ app.use(express.json());
 connectDB();
 
 app.use('/api/auth', authRoutes);
-app.use('/api/team', teamRoutes);
-app.use('/api/reports', reportRoutes);
+app.use('/api/employee', employeeRoutes);
+app.use('/api/manager', managerRoutes);
+
+app.use('/api/company', companyRoutes);
 
 app.use('/api/workweek', workweekRoutes);
-app.use('/api/company', companyRoutes);
-app.use('/api/contract', contractRoutes);
 
-app.use('/api/manager', managerRoutes);
 app.use('/api/reminder', reminderRoutes);
 
 

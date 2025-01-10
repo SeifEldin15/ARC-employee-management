@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 
-export const getEmployees = async (req, res) => {
+export const getManagerTeam = async (req, res) => {
     try {
-        const { managerId } = req.params;
+        const { managerId } = req.user._id;
         const employees = await User.find({ manager_id: managerId, role: 'Employee' }).sort('Region');
         res.status(200).json(employees);
     } catch (error) {
@@ -11,7 +11,7 @@ export const getEmployees = async (req, res) => {
     }
 };
 
-export const addEmployee = async (req, res) => {
+export const addManagerTeamMember = async (req, res) => {
     try {
         const { name, password, Region, job_title, email, phone, manager_id } = req.body;
 
@@ -37,7 +37,7 @@ export const addEmployee = async (req, res) => {
     }
 };
 
-export const deleteEmployee = async (req, res) => {
+export const deleteManagerTeamMember = async (req, res) => {
     try {
         const { employeeId } = req.params;
         await User.findByIdAndDelete(employeeId);

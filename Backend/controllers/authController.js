@@ -27,4 +27,9 @@ export const login = async (req, res) => {
     }
 };
 
+export const logout = (req, res) => {
+    // Invalidate the token on the client-side (e.g., by removing it from local storage)
+    res.status(200).json({ message: 'Logged out successfully' });
+};
+
 

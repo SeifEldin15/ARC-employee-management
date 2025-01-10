@@ -1,9 +1,9 @@
 'use client';
 import Sidebar from '@/components/Sidebar';
-import ActivityRects from '@/components/ActivityRects';
-import Distribution from '@/components/Distribution';
-import VerticalDistribution from '@/components/VericalDistribution';
-import Dashboard from '@/components/Dashboard';
+import ActivityRects from '@/components/Dashboard Main/ActivityRects';
+import Distribution from '@/components/Dashboard Main/Distribution';
+import VerticalDistribution from '@/components/Dashboard Main/VericalDistribution';
+import Dashboard from '@/components/Dashboard Main/Dashboard';
 
 export default function DashboardPage() {
   return (

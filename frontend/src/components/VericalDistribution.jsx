@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 const VerticalDistribution = () => {
   const [isClient, setIsClient] = useState(false);
   const [animatedData, setAnimatedData] = useState([]);
-  const [dimensions, setDimensions] = useState({ width: 600, height: 300 });
+  const [dimensions, setDimensions] = useState({ width: 600, height: 250 });
   const containerRef = useRef(null);
   
   const data = [
@@ -24,7 +24,7 @@ const VerticalDistribution = () => {
         const width = containerRef.current.offsetWidth;
         setDimensions({
           width: Math.max(width - 40, 200),
-          height: Math.min(width * 0.4, 200)
+          height: 250
         });
       }
     };
@@ -64,7 +64,7 @@ const VerticalDistribution = () => {
   }, []);
 
   if (!isClient) {
-    return <div className="w-full p-6 bg-white rounded-lg shadow-md border">Loading...</div>;
+    return <div className="w-full  bg-white rounded-lg shadow-md border">Loading...</div>;
   }
 
   return (
@@ -78,7 +78,7 @@ const VerticalDistribution = () => {
           width={dimensions.width}
           height={dimensions.height}
           data={animatedData}
-          margin={{ top: 5, right: 15, left: 15, bottom: 20 }}
+          margin={{ top: 5, right: 0, left: 0, bottom: 20 }}
         >
           <XAxis 
             dataKey="name" 

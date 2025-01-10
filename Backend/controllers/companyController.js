@@ -87,4 +87,58 @@ export const addTool = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Error adding tool', error: error.message });
     }
+};
+
+export const getCompanies = async (req, res) => {
+    try {
+        const companies = await Company.find().select('name contacts');
+        res.status(200).json(companies);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching contacts', error: error.message });
+    }
+};
+
+export const getCompanyDetails = async (req, res) => {
+    const { companyId } = req.params;
+    try {
+        const company = await Company.findById(companyId).select('name address tools');
+        if (!company) {
+            return res.status(404).json({ message: 'Company not found' });
+        }
+        res.status(200).json({
+            company: company.name,
+            details: {
+                address: company.address,
+                tools_installed: company.tools,
+                contacts: company.contacts
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching contact details', error: error.message });
+    }
+};
+
+export const getContacts = async (req, res) => {
+    try {
+        const companies = await Company.find().select('name contacts');
+        res.status(200).json(companies);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching contacts', error: error.message });
+    }
+};
+
+export const getTools = async (req, res) => {
+    const { companyId } = req.params;
+    try {
+        const company = await Company.findById(companyId).select('name tools');
+        if (!company) {
+            return res.status(404).json({ message: 'Company not found' });
+        }
+        res.status(200).json({
+            company: company.name,
+            tools: company.tools
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching tools', error: error.message });
+    }
 }; 

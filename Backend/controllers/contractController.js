@@ -34,3 +34,12 @@ export const deleteContract = async (req, res) => {
         res.status(500).json({ message: 'Error deleting contract', error: error.message });
     }
 };
+
+export const getContracts = async (req, res) => {
+    try {
+        const contracts = await Contract.find().select('company type remaining_hours');
+        res.status(200).json(contracts);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching contracts', error: error.message });
+    }
+};

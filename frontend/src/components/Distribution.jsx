@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 const Distribution = () => {
   const [isClient, setIsClient] = useState(false);
   const [animatedData, setAnimatedData] = useState([]);
-  const [dimensions, setDimensions] = useState({ width: 600, height: 300 });
+  const [dimensions, setDimensions] = useState({ width: 600, height: 250 });
   const containerRef = useRef(null);
   
   const data = [
@@ -21,8 +21,8 @@ const Distribution = () => {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
         setDimensions({
-          width: Math.max(width - 40, 300), // Subtract padding, with min width of 300
-          height: Math.min(width * 0.5, 300) // Responsive height with max of 300
+          width: Math.max(width - 40, 300),
+          height: 250
         });
       }
     };
@@ -78,7 +78,7 @@ const Distribution = () => {
           height={dimensions.height}
           data={animatedData}
           layout="vertical"
-          margin={{ top: 5, right: 20, left: 70, bottom: 5 }}
+          margin={{ top: 5, right: 20, left:0, bottom: 5 }}
         >
           <XAxis 
             type="number" 

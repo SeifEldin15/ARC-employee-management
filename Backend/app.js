@@ -25,7 +25,16 @@ connectDB();
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000'
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Accept', 
+    'Authorization',
+    'Origin',
+    'X-Requested-With'
+  ]
 }));
 
 app.use('/api/auth', authRoutes);

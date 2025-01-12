@@ -5,10 +5,37 @@ import LocationSection from '@/components/Contact/LocationSection';
 import Link from 'next/link';
 import ContactSection from '@/components/Contact/ContactSection';
 import Table from '@/components/Contact/Table';
+import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const params = useParams();
-  const id = params.id; // This will give you access to the dynamic ID parameter
+  const id = params.id;
+  const [companyData, setCompanyData] = useState(null);
+
+  useEffect(() => {
+    const fetchCompanyData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/company/${id}`, {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        setCompanyData(data);
+      } catch (error) {
+        console.error('Error fetching company data:', error);
+        if (error.response?.status === 401) {
+          window.location.href = '/login';
+        }
+      }
+    };
+
+    fetchCompanyData();
+  }, [id]);
 
   return (
     <div className="min-h-screen">
@@ -27,15 +54,14 @@ export default function DashboardPage() {
 
           {/* Company header */}
           <div className="text-center mb-8 max-w-4xl mx-auto">
-            <div className=" rounded-lg ">
-              <h1 className="text-3xl font-semibold text-gray-800">Acme Technologies</h1>
-              <p className="text-gray-700 mt-2 bg-gray-200 ">{id}</p>
+            <div className="rounded-lg">
+              <h1 className="text-3xl font-semibold text-gray-800">{companyData?.company || 'Loading...'}</h1>
             </div>
           </div>
 
-          <LocationSection />
-          <ContactSection />
-          <Table />
+          <LocationSection address={companyData?.address} region={companyData?.region} />
+          <ContactSection contacts={companyData?.details?.contacts || []} />
+          <Table tools={companyData?.details?.tools_installed || []} />
         </div>
       </div>
     </div>

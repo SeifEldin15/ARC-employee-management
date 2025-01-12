@@ -24,7 +24,7 @@ const ContactsDashboard = () => {
           return;
         }
 
-        const response = await fetch('http://35.92.39.225:5000/api/company', {
+        const response = await fetch('http://35.92.39.225/api/company', {
           method: 'GET',
           credentials: 'include',
           headers: {

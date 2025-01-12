@@ -14,7 +14,7 @@ pnpm dev
 bun dev
 ```
 
-Open [http://35.92.39.225:3000](http://35.92.39.225:3000) with your browser to see the result.
+Open [https://35.92.39.225:3000](https://35.92.39.225:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 

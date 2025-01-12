@@ -16,7 +16,7 @@ export default function DashboardPage() {
     const fetchCompanyData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://35.92.39.225/api/company/${id}`, {
+        const response = await fetch(`https://35.92.39.225/api/company/${id}`, {
           credentials: 'include',
           headers: {
             'Accept': 'application/json',

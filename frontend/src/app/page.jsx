@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await axios.post('http://35.92.39.225/api/auth/login', credentials, {
+      const response = await axios.post('https://35.92.39.225/api/auth/login', credentials, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',

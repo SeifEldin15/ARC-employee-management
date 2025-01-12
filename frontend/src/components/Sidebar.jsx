@@ -9,7 +9,7 @@ const Sidebar = () => {
     { title: 'Dashboard', icon: <MdDashboard className="text-xl md:text-lg" />, href: '/dashboard' },
     { title: 'Contacts', icon: <MdPeople className="text-xl md:text-lg" />, href: '/contacts' },
     { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/report' },
-    { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/customer-service' },
+    { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/pdf' },
     { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/reports' },
   ];
 

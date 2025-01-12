@@ -32,6 +32,13 @@ const Dashboard = () => {
     const fetchReports = async () => {
       try {
         const token = localStorage.getItem('token');
+        
+        // Check if token exists
+        if (!token) {
+          // window.location.href = '/login';
+          return;
+        }
+
         const response = await axios.get('https://slsvacation.com/api/employee/reports', {
           withCredentials: true,
           headers: {
@@ -45,10 +52,11 @@ const Dashboard = () => {
       } catch (err) {
         console.error('Fetch error:', err);
         if (err.response?.status === 401) {
-          // Handle unauthorized access - redirect to login
+          // Redirect to login if unauthorized
+          localStorage.removeItem('token'); // Clear invalid token
           // window.location.href = '/login';
         }
-        setError(err.response?.data?.message || err.message);
+        setError(err.response?.data?.message || 'Failed to fetch reports');
       } finally {
         setLoading(false);
       }

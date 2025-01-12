@@ -1,14 +1,15 @@
 import Contract from '../models/Contract.js'; 
+import Company from '../models/Company.js'
 
 export const createContract = async (req, res) => {
     try {
-        const { customer, contactName, srvNumber, contractHours, startDate, endDate, serviceType } = req.body;
+        const { customer, email , phone , address , contactName, srvNumber, contractHours, startDate, endDate, serviceType } = req.body;
         const newContract = new Contract({
             customer,
             contactName,
-            email: contact.email,
-            phone: contact.phone,
-            address: company.address,
+            email ,
+            phone ,
+            address ,
             srvNumber,
             contractHours,
             startDate: new Date(startDate), 
@@ -16,7 +17,7 @@ export const createContract = async (req, res) => {
             serviceType
         });
         await newContract.save();
-        res.status(201).json({ message: 'Contract created successfully', contract: newContract });
+        res.status(201).json({ newContract });
     } catch (error) {
         res.status(500).json({ message: 'Error creating contract', error: error.message });
     }
@@ -29,7 +30,7 @@ export const deleteContract = async (req, res) => {
         const deletedContract = await Contract.findByIdAndDelete(id);
         if (!deletedContract) return res.status(404).json({ message: 'Contract not found' });
 
-        res.status(200).json({ message: 'Contract deleted successfully', contract: deletedContract });
+        res.status(200).json({ message: 'Contract deleted successfully'});
     } catch (error) {
         res.status(500).json({ message: 'Error deleting contract', error: error.message });
     }
@@ -37,7 +38,7 @@ export const deleteContract = async (req, res) => {
 
 export const getContracts = async (req, res) => {
     try {
-        const contracts = await Contract.find().select('company type remaining_hours');
+        const contracts = await Contract.find().select('customer serviceType contractHours');
         res.status(200).json(contracts);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching contracts', error: error.message });

@@ -1,20 +1,21 @@
 import express from 'express';
 import { createCompany, deleteCompany, addContact, deleteContact, addTool, deleteTool, getCompanies, getCompanyDetails, getContacts, getTools } from '../controllers/companyController.js';
+import  authMiddleware  from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/', getCompanies);
-router.get('/:companyId/contacts', getContacts);
-router.get('/:companyId/tools', getTools);
-router.get('/:companyId', getCompanyDetails);
+router.get('/', authMiddleware ,getCompanies);
+router.get('/:companyId', authMiddleware , getCompanyDetails);
+router.get('/:companyId/contacts', authMiddleware, getContacts);
+router.get('/:companyId/tools',authMiddleware, getTools);
 
-router.post('/addCompany', createCompany);
-router.post('/:companyId/addTool', addTool);
-router.post('/:companyId/addContact', addContact);
+router.post('/',authMiddleware ,  createCompany);
+router.post('/:companyId/addTool', authMiddleware, addTool);
+router.post('/:companyId/addContact', authMiddleware , addContact);
 
-router.delete('/delete/:companyId', deleteCompany);
-router.delete('/:companyId/deleteContact/:contactId', deleteContact);
-router.delete('/:companyId/deleteTool/:toolId', deleteTool);
+router.delete('/delete/:companyId', authMiddleware , deleteCompany);
+router.delete('/:companyId/deleteContact/:contactId', authMiddleware , deleteContact);
+router.delete('/:companyId/deleteTool/:toolId', authMiddleware , deleteTool);
 
 export default router; 
 

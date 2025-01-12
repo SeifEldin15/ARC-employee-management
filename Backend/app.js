@@ -3,7 +3,6 @@ import cron from 'node-cron';
 import connectDB from './config/db.js';
 import Workweek from './models/workweek.js';
 
-
 import authRoutes from './routes/authRoutes.js';
 
 import employeeRoutes from './routes/employeeRoutes.js';
@@ -11,19 +10,23 @@ import employeeRoutes from './routes/employeeRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
 
 import workweekRoutes from './routes/workweekRoutes.js';
-import teamRoutes from './routes/teamRoutes.js';
 
 import managerRoutes from './routes/managerRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
 
+import cookieParser from 'cookie-parser';
+
+
 const app = express();
-app.use(express.json());
 
 connectDB();
 
+app.use(cookieParser());
+app.use(express.json());
+
 app.use('/api/auth', authRoutes);
 app.use('/api/employee', employeeRoutes);
-app.use('/api/manager', managerRoutes);
+app.use('/api/manager',  managerRoutes);
 
 app.use('/api/company', companyRoutes);
 

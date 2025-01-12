@@ -1,15 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Dashboard = () => {
-  const workWeeks = [
-    { id: 'WW49', date: 'Dec 1 - Dec 8, 2024', status: 'current' },
-    { id: 'WW48', date: 'Nov 25 - Nov 29, 2024', status: 'completed' },
-    { id: 'WW47', date: 'Nov 18 - Nov 22, 2024', status: 'completed' },
-    { id: 'WW46', date: 'Nov 11 - Nov 15, 2024', status: 'completed' },
-    { id: 'WW45', date: 'Nov 4 - Nov 8, 2024', status: 'completed' },
-    { id: 'WW44', date: 'Oct 28 - Nov 1, 2024', status: 'completed' },
-    { id: 'WW43', date: 'Oct 21 - Oct 25, 2024', status: 'completed' },
-  ];
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/employee/reports', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch reports');
+        }
+        
+        const data = await response.json();
+        setReports(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
+  if (loading) return <div className="w-full p-4">Loading...</div>;
+  if (error) return <div className="w-full p-4 text-red-500">Error: {error}</div>;
 
   return (
     <div className="w-full p-4 shadow-lg rounded-lg">
@@ -27,28 +49,24 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {workWeeks.map((week) => (
-                <tr key={week.id} className="hover:bg-gray-50">
+              {reports.map((report) => (
+                <tr key={report.weekNumber} className="hover:bg-gray-50">
                   <td className="px-4 py-2 whitespace-nowrap">
                     <span className="text-sm">
-                      {week.id} {week.status === 'current' && 
-                        <span className="ml-1 px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800">Current</span>
-                      }
+                      WW{report.weekNumber}
                     </span>
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{week.date}</td>
+                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                    {report.dateRange}
+                  </td>
                   <td className="px-4 py-2 whitespace-nowrap text-right">
-                    <button className={`w-full sm:w-auto px-3 py-1 rounded text-sm ${
-                      week.status === 'current'
-                        ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                        : 'bg-green-100 hover:bg-green-200 text-green-800'
-                    }`}>
-                      {week.status === 'current' ? 'Submit' : 'Download'} Utilization
+                    <button className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                      {report.utilizationReport ? 'Download' : 'Submit'} Utilization
                     </button>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-right">
                     <button className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                      {week.status === 'current' ? 'Submit' : 'Download'} CSR
+                      {report.csrReport ? 'Download' : 'Submit'} CSR
                     </button>
                   </td>
                 </tr>

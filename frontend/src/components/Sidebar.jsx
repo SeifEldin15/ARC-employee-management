@@ -13,6 +13,30 @@ const Sidebar = () => {
     { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/reports' },
   ];
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+
+      // Clear token and role from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+
+      // Redirect to login page
+      window.location.href = '/login';
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
   return (
     <>
       {/* Mobile Top Navbar */}
@@ -55,7 +79,7 @@ const Sidebar = () => {
               ))}
               <button 
                 className="flex items-center space-x-2 px-3 py-2 w-full rounded-md hover:bg-gray-800 hover:text-white transition-colors text-sm"
-                onClick={() => console.log('Logout clicked')}
+                onClick={handleLogout}
               >
                 <MdLogout className="text-lg" />
                 <span>Logout</span>
@@ -99,7 +123,7 @@ const Sidebar = () => {
         <div className="p-4">
           <button 
             className="flex items-center space-x-2 px-3 py-2 w-full rounded-md hover:bg-gray-800 hover:text-white transition-colors text-sm"
-            onClick={() => console.log('Logout clicked')}
+            onClick={handleLogout}
           >
             <MdLogout className="text-lg" />
             <span>Logout</span>

@@ -1,27 +1,54 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const Dashboard = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const reportsPerPage = 10;
+
+  const formatDateRange = (dateRange) => {
+    if (!dateRange) return '';
+    
+    const [startDate, endDate] = dateRange.split(' - ').map(date => new Date(date));
+    
+    return `${startDate.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric'
+    })} - ${endDate.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    })}`;
+  };
+
+  const indexOfLastReport = currentPage * reportsPerPage;
+  const indexOfFirstReport = indexOfLastReport - reportsPerPage;
+  const currentReports = reports.slice(indexOfFirstReport, indexOfLastReport);
+  const totalPages = Math.ceil(reports.length / reportsPerPage);
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/employee/reports', {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/employee/reports', {
+          withCredentials: true,
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           }
         });
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch reports');
-        }
-        
-        const data = await response.json();
-        setReports(data);
+        setReports(response.data);
       } catch (err) {
-        setError(err.message);
+        console.error('Fetch error:', err);
+        if (err.response?.status === 401) {
+          // Handle unauthorized access - redirect to login
+          window.location.href = '/login';
+        }
+        setError(err.response?.data?.message || err.message);
       } finally {
         setLoading(false);
       }
@@ -49,7 +76,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {reports.map((report) => (
+              {currentReports.map((report) => (
                 <tr key={report.weekNumber} className="hover:bg-gray-50">
                   <td className="px-4 py-2 whitespace-nowrap">
                     <span className="text-sm">
@@ -57,16 +84,30 @@ const Dashboard = () => {
                     </span>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                    {report.dateRange}
+                    {formatDateRange(report.dateRange)}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-right">
-                    <button className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                      {report.utilizationReport ? 'Download' : 'Submit'} Utilization
+                    <button 
+                      className={`w-full sm:w-auto ${
+                        report.utilizationReport === 'Not submitted' 
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                          : 'bg-green-100 hover:bg-green-200 text-green-800'
+                      } px-3 py-1 rounded text-sm`}
+                      disabled={report.utilizationReport === 'Not submitted'}
+                    >
+                      {report.utilizationReport === 'Not submitted' ? 'Not Available' : 'Download Utilization'}
                     </button>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-right">
-                    <button className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                      {report.csrReport ? 'Download' : 'Submit'} CSR
+                    <button 
+                      className={`w-full sm:w-auto ${
+                        report.csrReport === 'Not submitted'
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                          : 'bg-blue-500 hover:bg-blue-600 text-white'
+                      } px-3 py-1 rounded text-sm`}
+                      disabled={report.csrReport === 'Not submitted'}
+                    >
+                      {report.csrReport === 'Not submitted' ? 'Not Available' : 'Download CSR'}
                     </button>
                   </td>
                 </tr>
@@ -77,16 +118,19 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-3 flex flex-col sm:flex-row items-center justify-between sm:justify-end gap-2 text-sm">
-        <span className="text-gray-700 order-2 sm:order-1">Showing 1-7 of 42</span>
+        <span className="text-gray-700 order-2 sm:order-1">
+          Showing {indexOfFirstReport + 1}-{Math.min(indexOfLastReport, reports.length)} of {reports.length}
+        </span>
         <div className="flex gap-1 order-1 sm:order-2">
-          {[1, 2, 3, 4, 5].map((page) => (
+          {[...Array(totalPages)].map((_, index) => (
             <button
-              key={page}
+              key={index + 1}
+              onClick={() => setCurrentPage(index + 1)}
               className={`px-2 py-1 rounded ${
-                page === 1 ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100'
+                currentPage === index + 1 ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
-              {page}
+              {index + 1}
             </button>
           ))}
         </div>

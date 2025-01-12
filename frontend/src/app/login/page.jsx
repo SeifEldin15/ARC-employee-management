@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import axios from 'axios';
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({
@@ -15,28 +16,21 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
+      const response = await axios.post('http://localhost:5000/api/auth/login', credentials, {
+        withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
+        }
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Store token and role in localStorage or state management solution
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('role', data.role);
+      // Store token and role in localStorage
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('role', response.data.role);
       
-      // Redirect to dashboard or appropriate page
+      // Redirect to dashboard
       window.location.href = '/dashboard';
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }

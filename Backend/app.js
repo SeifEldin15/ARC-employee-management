@@ -27,11 +27,10 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api/manager',  managerRoutes);
-
 app.use('/api/company', companyRoutes);
 
-app.use('/api/workweek', workweekRoutes);
 
+app.use('/api/workweek', workweekRoutes);
 app.use('/api/reminder', reminderRoutes);
 
 

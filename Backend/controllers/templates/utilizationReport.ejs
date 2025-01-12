@@ -23,6 +23,19 @@
         }
         button {
             margin: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -39,33 +52,35 @@
             <tbody>
                 <tr>
                     <td>Monday</td>
-                    <td><input type="text" name="srv[Monday]" placeholder="SRV #"></td>
+                    <td><input type="text" name="srv[Monday]" placeholder="SRV #" required></td>
                 </tr>
                 <tr>
                     <td>Tuesday</td>
-                    <td><input type="text" name="srv[Tuesday]" placeholder="SRV #"></td>
+                    <td><input type="text" name="srv[Tuesday]" placeholder="SRV #" required></td>
                 </tr>
                 <tr>
                     <td>Wednesday</td>
-                    <td><input type="text" name="srv[Wednesday]" placeholder="SRV #"></td>
+                    <td><input type="text" name="srv[Wednesday]" placeholder="SRV #" required></td>
                 </tr>
                 <tr>
                     <td>Thursday</td>
-                    <td><input type="text" name="srv[Thursday]" placeholder="SRV #"></td>
+                    <td><input type="text" name="srv[Thursday]" placeholder="SRV #" required></td>
                 </tr>
                 <tr>
                     <td>Friday</td>
-                    <td><input type="text" name="srv[Friday]" placeholder="SRV #"></td>
+                    <td><input type="text" name="srv[Friday]" placeholder="SRV #" required></td>
                 </tr>
             </tbody>
         </table>
         <button type="button" id="add-category">Add Category</button>
         <button type="submit">Submit</button>
+        <p class="error" id="form-error"></p>
     </form>
 
     <script>
         const table = document.getElementById('utilization-table');
         const addCategoryButton = document.getElementById('add-category');
+        const errorElement = document.getElementById('form-error');
 
         // Add a new category column dynamically
         addCategoryButton.addEventListener('click', () => {
@@ -81,34 +96,52 @@
             for (let i = 1; i < rows.length; i++) {
                 const cell = document.createElement('td');
                 cell.innerHTML = `
-                    <select name="category[${rows[i].cells[0].textContent}][${categoryNumber}]">
+                    <select name="category[${rows[i].cells[0].textContent}][${categoryNumber}]" required>
                         <option value="">Select</option>
                         <option value="1">Category 1</option>
                         <option value="2">Category 2</option>
                         <option value="3">Category 3</option>
                     </select>
-                    <input type="number" name="hours[${rows[i].cells[0].textContent}][${categoryNumber}]" placeholder="Hours" style="width: 70px;">
+                    <input type="number" name="hours[${rows[i].cells[0].textContent}][${categoryNumber}]" placeholder="Hours" style="width: 70px;" min="0" required>
                 `;
                 rows[i].appendChild(cell);
             }
         });
 
         // Handle form submission
-        document.getElementById('utilization-form').addEventListener('submit', (event) => {
+        document.getElementById('utilization-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             const formData = new FormData(event.target);
-            const data = Object.fromEntries(formData.entries());
-            console.log(data);
 
-            // Post data to the server
-            fetch('/submit-utilization', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            })
-                .then(response => response.json())
-                .then(result => alert(result.message))
-                .catch(error => console.error('Error:', error));
+            // Validate required fields
+            const invalidFields = Array.from(formData.entries()).filter(([key, value]) => !value.trim());
+            if (invalidFields.length > 0) {
+                errorElement.textContent = "Please fill out all fields before submitting.";
+                return;
+            } else {
+                errorElement.textContent = "";
+            }
+
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/submit-utilization', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                    event.target.reset(); // Reset the form on success
+                } else {
+                    throw new Error("Failed to submit form");
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorElement.textContent = "An error occurred while submitting the form. Please try again.";
+            }
         });
     </script>
 </body>

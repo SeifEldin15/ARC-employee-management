@@ -32,7 +32,7 @@ const Dashboard = () => {
     const fetchReports = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('https://35.92.39.225/api/employee/reports', {
+        const response = await axios.get('https://medically-enhanced.com/api/employee/reports', {
           withCredentials: true,
           headers: {
             'Accept': 'application/json',

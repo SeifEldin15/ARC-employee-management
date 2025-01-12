@@ -24,7 +24,7 @@ const ContactsDashboard = () => {
           return;
         }
 
-        const response = await fetch('https://35.92.39.225/api/company', {
+        const response = await fetch('https://medically-enhanced.com/api/company', {
           method: 'GET',
           credentials: 'include',
           headers: {

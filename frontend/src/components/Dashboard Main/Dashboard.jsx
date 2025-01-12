@@ -46,7 +46,7 @@ const Dashboard = () => {
         console.error('Fetch error:', err);
         if (err.response?.status === 401) {
           // Handle unauthorized access - redirect to login
-          window.location.href = '/login';
+          // window.location.href = '/login';
         }
         setError(err.response?.data?.message || err.message);
       } finally {

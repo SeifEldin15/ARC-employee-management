@@ -101,16 +101,17 @@ export const getCompanies = async (req, res) => {
 export const getCompanyDetails = async (req, res) => {
     const { companyId } = req.params;
     try {
-        const company = await Company.findById(companyId).select('name address tools');
+        const company = await Company.findById(companyId).select('name address region  contacts tools');
         if (!company) {
             return res.status(404).json({ message: 'Company not found' });
         }
         res.status(200).json({
             company: company.name,
+            address: company.address ,
+            region : company.region ,
             details: {
-                address: company.address,
-                tools_installed: company.tools,
-                contacts: company.contacts
+                contacts: company.contacts,
+                tools_installed: company.tools
             }
         });
     } catch (error) {

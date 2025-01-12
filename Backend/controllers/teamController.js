@@ -3,8 +3,8 @@ import User from '../models/User.js';
 
 export const getManagerTeam = async (req, res) => {
     try {
-        const { managerId } = req.user._id;
-        const employees = await User.find({ manager_id: managerId, role: 'Employee' }).sort('Region');
+        const managerId  = req.user._id;
+        const employees = await User.find({ managerId }).sort('Region');
         res.status(200).json(employees);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching employees', error: error.message });
@@ -13,12 +13,11 @@ export const getManagerTeam = async (req, res) => {
 
 export const addManagerTeamMember = async (req, res) => {
     try {
-        const { name, password, Region, job_title, email, phone, manager_id } = req.body;
+        const managerId  = req.user._id;
 
-        // Hash the password
+        const { name, password, Region, job_title, email, phone } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create a new employee
+        
         const newEmployee = new User({
             name,
             password: hashedPassword,
@@ -27,11 +26,11 @@ export const addManagerTeamMember = async (req, res) => {
             job_title,
             email,
             phone,
-            manager_id
+            managerId
         });
 
         await newEmployee.save();
-        res.status(201).json({ message: 'Employee added successfully', employee: newEmployee });
+        res.status(201).json({ message: 'Employee added successfully'});
     } catch (error) {
         res.status(500).json({ message: 'Error adding employee', error: error.message });
     }

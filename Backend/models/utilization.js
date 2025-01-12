@@ -2,8 +2,14 @@ import mongoose from "mongoose";
 
 const utilizationSchema = new mongoose.Schema({
     employeeId: String,
-    workWeek: Number,
+    WorkWeekNumber: Number,
     year: Number,
+    SVR_Category :[
+        {
+            SVR: Number,
+            day: String
+        }
+    ],
     tasks: [
         {
             category: String,

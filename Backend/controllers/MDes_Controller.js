@@ -4,7 +4,7 @@ import Workweek from '../models/workweek.js';
 
 export const getManagerDashboard = async (req, res) => {
     try {
-        const managerId = req.user._id;
+        const managerId = req.user.id;
         const employees = await User.find({ manager_id: managerId, role: 'Employee' });
 
         const today = new Date();

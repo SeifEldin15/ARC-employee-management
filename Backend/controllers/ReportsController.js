@@ -6,6 +6,13 @@ import fs from 'fs';
 import path from 'path';
 import ejs from 'ejs';
 import puppeteer from 'puppeteer';
+import { fileURLToPath } from 'url';
+
+
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const getEmployeeReports = async (req, res) => {
     try {
@@ -33,54 +40,61 @@ export const getEmployeeReports = async (req, res) => {
 
 export const submitUtilization = async (req, res) => {
     try {
-        const { employeeId, tasks, serviceEngineer } = req.body;
+        const employeeId = req.user._id;
 
-        const today = new Date();
-        const currentWeek = await Workweek.findOne({ startDate: { $lte: today }, endDate: { $gte: today } });
-
-        if (!currentWeek) return res.status(400).json({ error: 'No active work week found.' });
+        const { WorkWeekNumber, year, SVR_Category, tasks, serviceEngineer } = req.body;
 
         const totalHours = tasks.reduce((sum, task) => sum + task.hours, 0);
 
         const report = new Utilization({
             employeeId,
-            workWeek: currentWeek.weekNumber,
-            year: currentWeek.year,
+            WorkWeekNumber,
+            year,
+            SVR_Category,
             tasks,
+            serviceEngineer,
             totalHours
         });
 
         await report.save();
 
-        // Generate HTML content
-        const templatePath = path.join(__dirname, '../templates/utilizationReport.ejs');
-        const html = await ejs.renderFile(templatePath, {
-            startDate: currentWeek.startDate.toDateString(),
-            endDate: currentWeek.endDate.toDateString(),
-            workWeek: currentWeek.weekNumber,
-            serviceEngineer,
-            tasks
-        });
+        // const templatePath = path.join(__dirname, './templates/utilizationReport.ejs');
+        // const html = await ejs.renderFile(templatePath, {
+        //     WorkWeekNumber,
+        //     serviceEngineer,
+        //     tasks,
+        //     year
+        // });
 
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'domcontentloaded' });
-        const pdfPath = `/data/Utilization_Report_${currentWeek.weekNumber}_${serviceEngineer}.pdf`;
-        await page.pdf({ path: pdfPath, format: 'A4', printBackground: true });
-        await browser.close();
+        // // Generate the PDF using Puppeteer
+        // const browser = await puppeteer.launch();
+        // const page = await browser.newPage();
+        // await page.setContent(html, { waitUntil: 'domcontentloaded' });
+        // const pdfPath = `../data/Utilization_Report/${WorkWeekNumber}_${serviceEngineer}.pdf`;
+        // await page.pdf({ path: pdfPath, format: 'A4', printBackground: true });
+        // await browser.close();
 
+        // // Assuming the pendingReports for this week are being managed elsewhere
+        // // Update the report for the employee if applicable
+        // const workweek = await Workweek.findOne({ weekNumber: WorkWeekNumber });
+        // if (!workweek) return res.status(400).json({ error: 'WorkWeek not found' });
 
-         const employeeReport = currentWeek.pendingReports.find(report => report.employeeId.toString() === employeeId);
-         if (employeeReport) {
-             const utilizationReport = employeeReport.reportTypes.find(rt => rt.type === 'Utilization');
-             if (utilizationReport) {
-                 utilizationReport.pdfPath = pdfPath;
-                 utilizationReport.submittedAt = new Date();
-             }
-         }
-         await currentWeek.save();
+        // const employeeReport = workweek.pendingReports.find(
+        //     (report) => report.employeeId.toString() === employeeId
+        // );
 
-        res.status(200).json({ message: 'Utilization report submitted successfully!', pdfPath });
+        // if (employeeReport) {
+        //     const utilizationReport = employeeReport.reportTypes.find(rt => rt.type === 'Utilization');
+        //     if (utilizationReport) {
+        //         utilizationReport.pdfPath = pdfPath;
+        //         utilizationReport.submittedAt = new Date();
+        //     }
+        // }
+
+        // // Save updated workweek
+        // await workweek.save();
+
+        res.status(200).json({ message: 'Utilization report submitted successfully!' });
     } catch (error) {
         res.status(500).json({ error: 'Error submitting utilization report', details: error.message });
     }
@@ -92,6 +106,8 @@ export const submitCSR = async (req, res) => {
         const {
             spvNumber,
             serviceEngineer,
+            WorkWeekNumber,
+            weekEndDate,
             customer,
             address,
             contact,
@@ -101,29 +117,45 @@ export const submitCSR = async (req, res) => {
             jobType,
             systemType,
             jiraTicketNumber,
-            weeklyTaskReport,
+            weeklyTaskReport = [],
             purposeOfVisit,
             solution,
             recommendations,
             additionalNotes,
-            returnVisitRequired
+            returnVisitRequired,
         } = req.body;
 
-        // Assuming req.user is set by authentication middleware
+        // Validate weeklyTaskReport
+        if (!Array.isArray(weeklyTaskReport) || weeklyTaskReport.length !== 7) {
+            return res.status(400).json({
+                error: 'weeklyTaskReport must be an array with 7 days of data.',
+            });
+        }
+
+        // Validate fields in each day
+        for (const day of weeklyTaskReport) {
+            if (
+                !day.date ||
+                typeof day.travelHours !== 'number' ||
+                typeof day.regularHours !== 'number' ||
+                typeof day.overtimeHours !== 'number' ||
+                typeof day.holidayHours !== 'number' ||
+                typeof day.hourlyRate !== 'number'
+            ) {
+                return res.status(400).json({
+                    error: 'Invalid weeklyTaskReport format. Ensure each day has date, travelHours, regularHours, overtimeHours, holidayHours, and hourlyRate.',
+                });
+            }
+        }
+
         const employeeId = req.user._id;
-
-        // Fetch Current Workweek
-        const today = new Date();
-        const currentWeek = await Workweek.findOne({ startDate: { $lte: today }, endDate: { $gte: today } });
-
-        if (!currentWeek) return res.status(400).json({ error: 'No active workweek found.' });
 
         const csr = new CSR({
             employeeId,
             spvNumber,
             serviceEngineer,
-            workWeek: currentWeek.weekNumber,
-            weekEndDate: currentWeek.endDate,
+            WorkWeekNumber,
+            weekEndDate,
             customer,
             address,
             contact,
@@ -135,25 +167,30 @@ export const submitCSR = async (req, res) => {
             jiraTicketNumber,
             weeklyTaskReport,
             totals: {
-                totalWeekHours: weeklyTaskReport.reduce((sum, day) => sum + day.totalHours, 0),
-                totalWeekUSD: weeklyTaskReport.reduce((sum, day) => sum + day.totalUSD, 0)
+                totalWeekHours: weeklyTaskReport.reduce(
+                    (sum, day) => sum + (day.totalHours || 0),
+                    0
+                ),
+                totalWeekUSD: weeklyTaskReport.reduce(
+                    (sum, day) => sum + (day.totalUSD || 0),
+                    0
+                ),
             },
             purposeOfVisit,
             solution,
             recommendations,
             additionalNotes,
-            returnVisitRequired
+            returnVisitRequired,
         });
 
-        await csr.save();
 
         // Render HTML template
-        const templatePath = path.join(__dirname, '../templates/csrTemplate.ejs');
+        const templatePath = path.join(__dirname, './templates/csrTemplate.ejs');
         const html = await ejs.renderFile(templatePath, {
             spvNumber,
             serviceEngineer,
-            workWeek: currentWeek.weekNumber,
-            weekEndDate: currentWeek.endDate.toDateString(),
+            workWeek: WorkWeekNumber, // Map WorkWeekNumber to workWeek
+            weekEndDate,
             customer,
             address,
             contact,
@@ -169,30 +206,61 @@ export const submitCSR = async (req, res) => {
             solution,
             recommendations,
             additionalNotes,
-            returnVisitRequired
+            returnVisitRequired,
         });
+        var pdfPath ;
+    // Generate PDF using Puppeteer
+        try {
+            const pdfDirectory = path.join(__dirname, '../data/CSR_Report');
+        
+            // Ensure the directory exists
+            if (!fs.existsSync(pdfDirectory)) {
+                fs.mkdirSync(pdfDirectory, { recursive: true });
+            }
+        
+            pdfPath = path.join(pdfDirectory, `${WorkWeekNumber}_${spvNumber}_${serviceEngineer}.pdf`);
+        
+            const browser = await puppeteer.launch({
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            }); 
+                
+            const page = await browser.newPage();
+                
+            await page.setContent(html, { waitUntil: 'domcontentloaded' });
+            await page.pdf({ path: pdfPath, format: 'A4', printBackground: true });
+                
+            await browser.close();
 
-        // Generate PDF using Puppeteer
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'domcontentloaded' });
-        const pdfPath = `/data/CSR_Report/${currentWeek.weekNumber}_${spvNumber}_${serviceEngineer}.pdf`;
-        await page.pdf({ path: pdfPath, format: 'A4', printBackground: true });
-        await browser.close();
+        } catch (error) {
+            res.status(500).json({ error: 'Error generating PDF', details: error.message });
+        }
 
-        // Update Workweek with PDF path
-        const employeeReport = currentWeek.pendingReports.find(report => report.employeeId.toString() === employeeId);
+
+        const workweek = await Workweek.findOne({ weekNumber: WorkWeekNumber });
+        const employeeReport = workweek.pendingReports.find(
+            (report) => report.employeeId.toString() === employeeId
+        );
+        
+        console.log(employeeReport)
         if (employeeReport) {
-            const csrReport = employeeReport.reportTypes.find(rt => rt.type === 'CSR');
-            if (csrReport) {
-                csrReport.pdfPath = pdfPath;
-                csrReport.submittedAt = new Date();
+            const CSR_Report = employeeReport.reportTypes.find(rt => rt.type === 'CSR');
+            console.log(CSR_Report)
+            if (CSR_Report) {
+                CSR_Report.pdfPath = pdfPath;
+                CSR_Report.submittedAt = new Date();
             }
         }
-        await currentWeek.save();
 
-        res.status(200).json({ message: 'CSR submitted successfully!', pdfPath });
+        // Save updated workweek
+        await workweek.save();
+
+        csr.pdfPath = pdfPath;
+        await csr.save();
+
+    res.status(200).json({ message: 'CSR submitted successfully!', pdfPath });
+
     } catch (error) {
+        console.error('Error submitting CSR:', error);
         res.status(500).json({ error: 'Error submitting CSR', details: error.message });
     }
 };

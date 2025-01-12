@@ -33,7 +33,7 @@ export const deleteTool = async (req, res) => {
         }
         company.tools.id(toolId).remove();
         await company.save();
-        res.json({ message: 'Tool deleted', company });
+        res.json({ message: 'Tool deleted' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting tool', error: error.message });
     }
@@ -66,7 +66,7 @@ export const deleteContact = async (req, res) => {
         }
         company.contacts.id(contactId).remove();
         await company.save();
-        res.json({ message: 'Contact deleted', company });
+        res.json({ message: 'Contact deleted' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting contact', error: error.message });
     }
@@ -91,7 +91,7 @@ export const addTool = async (req, res) => {
 
 export const getCompanies = async (req, res) => {
     try {
-        const companies = await Company.find().select('name contacts');
+        const companies = await Company.find().select(' name address contacts ');
         res.status(200).json(companies);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching contacts', error: error.message });

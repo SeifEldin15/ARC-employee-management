@@ -16,20 +16,39 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ _id: user._id , role: user.role }, JWT_SECRET, { expiresIn: '3h' });
         
-        res.cookie('token', token, { httpOnly: true, secure: NODE_ENV === 'production' });
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/', 
+        });        
+        // const redirectUrl = user.role === 'Manager' ? '/manager/dashboard' : '/employee/dashboard';
+        // res.redirect(redirectUrl);
+
+        res.status(200).json({ 
+            "token": token ,
+            "role": user.role 
+          })
         
-        const redirectUrl = user.role === 'Manager' ? '/manager/dashboard' : '/employee/dashboard';
-        res.redirect(redirectUrl);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 export const logout = (req, res) => {
-    // Invalidate the token on the client-side (e.g., by removing it from local storage)
-    res.status(200).json({ message: 'Logged out successfully' });
+    try {
+       res.clearCookie('token', {
+            httpOnly: true,
+            secure: NODE_ENV === 'production',
+            sameSite: 'strict',
+        });
+        // Send a success message
+        res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error during logout', error: error.message });
+    }
 };
 
 

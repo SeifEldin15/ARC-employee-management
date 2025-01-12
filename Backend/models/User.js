@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     job_title: { type: String },
     email: { type: String, required: true, unique: true },
     phone: { type: String },
-    manager_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
 export default mongoose.model('User', userSchema);

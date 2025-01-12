@@ -16,27 +16,51 @@ const __dirname = path.dirname(__filename);
 
 export const getEmployeeReports = async (req, res) => {
     try {
-        const employeeId = req.user._id;
-        const workweeks = await Workweek.find({}).populate('pendingReports.employeeId');
+        const employeeId = req.user._id.toString(); 
+        
+        const workweeks = await Workweek.find({})
+            .sort({ weekNumber: 1 })
 
-        const reports = await Promise.all(workweeks.map(async (week) => {
-            const employeeReport = week.pendingReports.find(report => report.employeeId.toString() === employeeId);
-            const utilizationReport = employeeReport?.reportTypes.find(rt => rt.type === 'Utilization');
-            const csrReport = employeeReport?.reportTypes.find(rt => rt.type === 'CSR');
+        const reports = workweeks.map((week) => {
+            const employeeReport = week.pendingReports.find(
+                (report) => report.employeeId?.toString() === employeeId
+            );
+
+            if (!employeeReport) {
+                return {
+                    weekNumber: week.weekNumber,
+                    dateRange: `${new Date(week.startDate).toDateString()} - ${new Date(
+                        week.endDate
+                    ).toDateString()}`,
+                    utilizationReport: 'Not submitted',
+                    csrReport: 'Not submitted',
+                };
+            }
+
+            const utilizationReport = employeeReport.reportTypes.find(
+                (rt) => rt.type === 'Utilization'
+            );
+            const csrReport = employeeReport.reportTypes.find(
+                (rt) => rt.type === 'CSR'
+            );
 
             return {
                 weekNumber: week.weekNumber,
-                dateRange: `${week.startDate} - ${week.endDate}`,
-                utilizationReport: utilizationReport ? utilizationReport.pdfPath : 'Not submitted',
-                csrReport: csrReport ? csrReport.pdfPath : 'Not submitted'
+                dateRange: `${new Date(week.startDate).toDateString()} - ${new Date(
+                    week.endDate
+                ).toDateString()}`,
+                utilizationReport: utilizationReport?.pdfPath || 'Not submitted',
+                csrReport: csrReport?.pdfPath || 'Not submitted',
             };
-        }));
+        });
 
         res.status(200).json(reports);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching employee reports', error: error.message });
     }
 };
+
+
 
 export const submitUtilization = async (req, res) => {
     try {

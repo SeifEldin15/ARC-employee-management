@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await axios.post('https://medically-enhanced.com/api/auth/login', credentials, {
+      const response = await axios.post('https://slsvacation.com/api/auth/login', credentials, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',

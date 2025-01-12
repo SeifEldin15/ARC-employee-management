@@ -25,7 +25,7 @@ connectDB();
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
-  origin: 'https://arc-employee-management.vercel.app',
+  origin: ['https://arc-employee-management.vercel.app', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: [

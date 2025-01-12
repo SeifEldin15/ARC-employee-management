@@ -24,8 +24,6 @@ export const login = async (req, res) => {
             sameSite: 'strict',
             path: '/', 
         });        
-        // const redirectUrl = user.role === 'Manager' ? '/manager/dashboard' : '/employee/dashboard';
-        // res.redirect(redirectUrl);
 
         res.status(200).json({ 
             "token": token ,

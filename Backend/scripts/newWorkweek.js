@@ -8,7 +8,7 @@ const startOfYear = new Date(today.getFullYear(), 0, 1);
 const dayOfYear = Math.floor((today - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
 let weekNumber = Math.ceil(dayOfYear / 7);
 
-for (let i = 0; i < 10; i++) {
+for (let i = 11; i < 30 ; i++) {
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay() + 1 + (i * 7)); // Monday of the i-th week
     weekStart.setHours(0, 0, 0, 0); // Set time to midnight

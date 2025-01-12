@@ -8,14 +8,14 @@ const Sidebar = () => {
   const menuItems = [
     { title: 'Dashboard', icon: <MdDashboard className="text-xl md:text-lg" />, href: '/dashboard' },
     { title: 'Contacts', icon: <MdPeople className="text-xl md:text-lg" />, href: '/contacts' },
-    { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/utilization' },
+    { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/report' },
     { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/customer-service' },
     { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/reports' },
   ];
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('https://slsvacation.com/api/auth/logout', {
+      const response = await fetch('http://localhost:5000/api/auth/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

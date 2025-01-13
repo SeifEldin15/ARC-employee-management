@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
+import Link from 'next/link';
 
 const ManagerContacts = () => {
   const [contracts, setContracts] = useState([]);
@@ -33,6 +34,7 @@ const ManagerContacts = () => {
         const contractsArray = Array.isArray(data) ? data : (data.contracts || []);
         
         const transformedData = contractsArray.map(contract => ({
+          id: contract._id || contract.id,
           company: contract.customer,
           type: contract.serviceType,
           hours: contract.contractHours,
@@ -71,8 +73,13 @@ const ManagerContacts = () => {
 
               {contracts.map((contract, index) => (
                 <div key={index} className="grid grid-cols-12 p-4 border-b last:border-b-0 items-center">
-                  <div className="text-blue-600 hover:text-blue-800 cursor-pointer col-span-3">
-                    {contract.company}
+                  <div className="col-span-3">
+                    <Link 
+                      href={`/contact/${contract.id}`}
+                      className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                    >
+                      {contract.company}
+                    </Link>
                   </div>
                   <div className="col-span-3">
                     <span className={`px-3 py-1 rounded-full text-sm ${

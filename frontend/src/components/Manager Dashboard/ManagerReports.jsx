@@ -1,33 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BsFillBellFill } from 'react-icons/bs';
+import axios from 'axios';
 
 const ManagerReports = () => {
-  const employees = [
-    {
-      name: 'Emily Team',
-      reports: [
-        { date: 'WK47 (Nov 17 - Nov 23)', missing: true },
-        { date: 'WK48 (Nov 24 - Nov 30)', missing: true },
-        { date: 'WK49 (Dec 1 - Dec 7)', missing: true },
-      ],
-      status: '1 Missing'
-    },
-    {
-      name: 'Nancy Wright',
-      reports: [
-        { date: 'WK47 (Nov 17 - Nov 23)', missing: true },
-        { date: 'WK48 (Nov 24 - Nov 30)', missing: true },
-        { date: 'WK49 (Dec 1 - Dec 7)', missing: true },
-      ],
-      status: '1 Missing'
-    },
-    // Add more employees with "Up to Date" status
-    {
-      name: 'Christopher King',
-      reports: [],
-      status: 'Up to Date'
-    },
-  ];
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/manager/dashboard', {
+          withCredentials: true,
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+        
+        // Transform API data to match component structure
+        const transformedData = response.data.map(item => ({
+          name: item.employee.name,
+          reports: item.missingWeeks.map(week => ({
+            date: week,
+            missing: true
+          })),
+          status: item.missingWeeks.length > 0 ? `${item.missingWeeks.length} Missing` : 'Up to Date'
+        }));
+
+        setEmployees(transformedData);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        // Handle unauthorized access
+        if (error.response?.status === 401) {
+          // Redirect to login page
+          window.location.href = '/';
+        }
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
     <div className="p-6">

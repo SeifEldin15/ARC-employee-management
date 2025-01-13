@@ -13,7 +13,11 @@ const Sidebar = () => {
       icon: <MdDashboard className="text-xl md:text-lg" />, 
       href: role === 'Manager' ? '/managerdashboard' : '/dashboard'
     },
-    { title: 'Contacts', icon: <MdPeople className="text-xl md:text-lg" />, href: '/contacts' },
+    { 
+      title: 'Contacts', 
+      icon: <MdPeople className="text-xl md:text-lg" />, 
+      href: role === 'Manager' ? '/managercontacts' : '/contacts' 
+    },
     { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/report' },
     { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/pdf' },
     { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/myreports' },

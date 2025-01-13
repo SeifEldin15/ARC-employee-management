@@ -15,21 +15,41 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
+    console.log('Submitting credentials:', {
+        email: credentials.email,
+        password: credentials.password ? '[REDACTED]' : 'missing'
+    });
+
     try {
-      const response = await axios.post('https://slsvacation.com/api/auth/login', credentials, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await axios.post('http://localhost:5000/api/auth/login', 
+        credentials,
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
         }
-      });
+      );
+
+      console.log('Response received:', response.data);
 
       // Store token and role in localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('role', response.data.role);
       
-      // Redirect to dashboard
-      window.location.href = '/dashboard';
+      // Redirect based on role
+      if (response.data.role === 'Manager') {
+        window.location.href = '/managerdashboard';
+      } else {
+        window.location.href = '/dashboard';
+      }
     } catch (err) {
+      console.error('Login error:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
       setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);

@@ -65,7 +65,9 @@ export default function TeamPage() {
                   </div>
                   <div>
                     <h3 className="font-medium">{member.name}</h3>
-                    <p className="text-sm text-gray-600">{member.title}</p>
+                    <p className="text-sm text-gray-600 bg-gray-100 rounded px-2 py-0.5 text-center">
+                      {member.title}
+                    </p>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">

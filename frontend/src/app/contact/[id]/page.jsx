@@ -60,7 +60,10 @@ export default function DashboardPage() {
           </div>
 
           <LocationSection address={companyData?.address} region={companyData?.region} />
-          <ContactSection contacts={companyData?.details?.contacts || []} />
+          <ContactSection 
+            contacts={companyData?.details?.contacts || []} 
+            companyId={id}
+          />
           <Table tools={companyData?.details?.tools_installed || []} />
         </div>
       </div>

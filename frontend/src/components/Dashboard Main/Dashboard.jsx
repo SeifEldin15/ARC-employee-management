@@ -39,7 +39,7 @@ const Dashboard = () => {
           return;
         }
 
-        const response = await axios.get('https://slsvacation.com/api/employee/reports', {
+        const response = await axios.get('http://localhost:5000/api/employee/reports', {
           withCredentials: true,
           headers: {
             'Accept': 'application/json',
@@ -85,7 +85,7 @@ const Dashboard = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {currentReports.map((report) => (
-                <tr key={report.weekNumber} className="hover:bg-gray-50">
+                <tr key={`${report.weekNumber}-${report.dateRange}`} className="hover:bg-gray-50">
                   <td className="px-4 py-2 whitespace-nowrap">
                     <span className="text-sm">
                       WW{report.weekNumber}
@@ -130,9 +130,9 @@ const Dashboard = () => {
           Showing {indexOfFirstReport + 1}-{Math.min(indexOfLastReport, reports.length)} of {reports.length}
         </span>
         <div className="flex gap-1 order-1 sm:order-2">
-          {[...Array(totalPages)].map((_, index) => (
+          {Array.from({ length: totalPages }, (_, index) => (
             <button
-              key={index + 1}
+              key={`page-${index + 1}`}
               onClick={() => setCurrentPage(index + 1)}
               className={`px-2 py-1 rounded ${
                 currentPage === index + 1 ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100'

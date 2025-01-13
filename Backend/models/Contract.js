@@ -7,7 +7,7 @@ const contractSchema = new mongoose.Schema({
     email: { type: String ,required: true } , 
     phone:{ type: String ,required: true } , 
     address:{ type: String ,required: true } , 
-    srvNumber: { type: Number ,required: true , unique: true } , 
+    srvNumber: { type: String ,required: true , unique: true } , 
     contractHours: { type: Number ,required: true } , 
     startDate: { type: Date ,required: true } , 
     endDate: { type: Date ,required: true } , 

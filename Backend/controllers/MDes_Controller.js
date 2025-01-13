@@ -5,14 +5,21 @@ import Workweek from '../models/workweek.js';
 export const getManagerDashboard = async (req, res) => {
     try {
         const managerId = req.user._id;
-        const employees = await User.find({ manager_id: managerId, role: 'Employee' });
 
-        const today = new Date();
-        const currentWeek = await Workweek.findOne({ startDate: { $lte: today }, endDate: { $gte: today } });
+        const employees = await User.find({ managerId, role: 'Employee' }).select("name email");
+
+        const allWeeks = await Workweek.find().select('weekNumber startDate endDate pendingReports');
 
         const employeeData = await Promise.all(employees.map(async (employee) => {
-            const reports = await Utilization.find({ employeeId: employee._id, year: currentWeek.year });
-            const missingWeeks = []; // Logic to determine missing weeks
+            const missingWeeks = allWeeks
+                .filter(week => {
+                    const report = week.pendingReports.find(report => report.employeeId.equals(employee._id));
+                    return !report;
+                })
+                .map(week => ({
+                    weekNumber: `WW${week.weekNumber}`,
+                    dateRange: `${week.startDate.toISOString().split('T')[0]} - ${week.endDate.toISOString().split('T')[0]}`
+                }));
 
             return {
                 employee,

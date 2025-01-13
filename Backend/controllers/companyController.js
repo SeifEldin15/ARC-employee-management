@@ -1,4 +1,5 @@
 import Company from '../models/Company.js';
+import CSR from '../models/csr.js'
 
 export const createCompany = async (req, res) => {
         const { name, address, region, contacts = [], tools = [] } = req.body;
@@ -86,6 +87,29 @@ export const addTool = async (req, res) => {
         res.status(201).json(company);
     } catch (error) {
         res.status(500).json({ message: 'Error adding tool', error: error.message });
+    }
+};
+
+export const getPastVisitForCompany = async (req, res) => {
+    
+    const { companyId } = req.params;
+
+    try {
+        const csrData = await CSR.find({ companyId }).select(
+            'serviceEngineer weekEndDate totals.totalWeekHours purposeOfVisit'
+        );
+
+        const formattedData = csrData.map((item) => ({
+            serviceEngineer: item.serviceEngineer,
+            weekStartDate: item.weekEndDate.toISOString().split('T')[0], 
+            totalHours: item.totals.totalWeekHours,
+            purposeOfVisit: item.purposeOfVisit,
+        }));
+
+        res.status(200).json(formattedData);
+    } catch (err) {
+        console.error('Error fetching CSR data for company:', err);
+        res.status(500).json({ error: 'Failed to fetch CSR data for company' });
     }
 };
 

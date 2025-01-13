@@ -14,6 +14,30 @@ import {submitReport } from '../utils/submitReport.js'
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+export const getPastVisitForCompany = async (req, res) => {
+    
+    const { companyId } = req.params;
+    
+    const employeeId = req.user._id;
+    try {
+        const csrData = await CSR.find({ companyId , employeeId }).select(
+            'serviceEngineer weekEndDate totals.totalWeekHours purposeOfVisit'
+        );
+
+        const formattedData = csrData.map((item) => ({
+            serviceEngineer: item.serviceEngineer,
+            weekStartDate: item.weekEndDate.toISOString().split('T')[0], 
+            totalHours: item.totals.totalWeekHours,
+            purposeOfVisit: item.purposeOfVisit,
+        }));
+
+        res.status(200).json(formattedData);
+    } catch (err) {
+        console.error('Error fetching CSR data for company:', err);
+        res.status(500).json({ error: 'Failed to fetch CSR data for company' });
+    }
+};
+
 export const getEmployeeReports = async (req, res) => {
     console.log('[getEmployeeReports] Request:', {
         employeeId: req.user._id,
@@ -154,11 +178,12 @@ export const submitCSR = async (req, res) => {
     });
     try {
         const {
-            spvNumber,
+            srvNumber,
             serviceEngineer,
             WorkWeekNumber,
             weekEndDate,
             customer,
+            companyId,
             address,
             contact,
             email,
@@ -202,11 +227,12 @@ export const submitCSR = async (req, res) => {
 
         const csr = new CSR({
             employeeId,
-            spvNumber,
+            srvNumber,
             serviceEngineer,
             WorkWeekNumber,
             weekEndDate,
             customer,
+            companyId,
             address,
             contact,
             email,
@@ -237,7 +263,7 @@ export const submitCSR = async (req, res) => {
         // Render HTML template
         const templatePath = path.join(__dirname, './templates/csrTemplate.ejs');
         const html = await ejs.renderFile(templatePath, {
-            spvNumber,
+            srvNumber,
             serviceEngineer,
             workWeek: WorkWeekNumber,
             weekEndDate,
@@ -270,7 +296,7 @@ export const submitCSR = async (req, res) => {
                 fs.mkdirSync(pdfDirectory, { recursive: true });
             }
         
-            pdfPath = path.join(pdfDirectory, `WW${WorkWeekNumber}_${spvNumber}_${serviceEngineer}.pdf`);
+            pdfPath = path.join(pdfDirectory, `WW${WorkWeekNumber}_${srvNumber}_${serviceEngineer}.pdf`);
         
             const browser = await puppeteer.launch({
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],

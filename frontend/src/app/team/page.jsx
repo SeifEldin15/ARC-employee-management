@@ -63,11 +63,13 @@ export default function TeamPage() {
                   <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
                     {member.initials}
                   </div>
-                  <div>
-                    <h3 className="font-medium">{member.name}</h3>
-                    <p className="text-sm text-gray-600 bg-gray-100 rounded px-2 py-0.5 text-center">
-                      {member.title}
-                    </p>
+                  <div className="flex flex-col items-center justify-center flex-grow">
+                    <h3 className="font-medium text-center text-sm">{member.name}</h3>
+                    <div className="flex justify-center mt-2">
+                      <p className="text-xs text-gray-600 bg-gray-100 rounded px-2 py-0.5 inline-block">
+                        {member.title}
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">

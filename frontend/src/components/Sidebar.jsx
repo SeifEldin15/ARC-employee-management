@@ -1,16 +1,27 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { MdDashboard, MdPeople, MdTimeline, MdSupportAgent, MdDescription, MdLogout, MdMenu } from 'react-icons/md';
+import { MdDashboard, MdPeople, MdTimeline, MdSupportAgent, MdDescription, MdLogout, MdMenu, MdGroups } from 'react-icons/md';
 
 const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const role = localStorage.getItem('role');
+  
   const menuItems = [
-    { title: 'Dashboard', icon: <MdDashboard className="text-xl md:text-lg" />, href: '/dashboard' },
+    { 
+      title: 'Dashboard', 
+      icon: <MdDashboard className="text-xl md:text-lg" />, 
+      href: role === 'Manager' ? '/managerdashboard' : '/dashboard'
+    },
     { title: 'Contacts', icon: <MdPeople className="text-xl md:text-lg" />, href: '/contacts' },
     { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/report' },
     { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/pdf' },
     { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/myreports' },
+    ...(role === 'Manager' ? [{
+      title: 'Team',
+      icon: <MdGroups className="text-xl md:text-lg" />,
+      href: '/team'
+    }] : [])
   ];
 
   const handleLogout = async () => {
@@ -34,10 +45,10 @@ const Sidebar = () => {
       localStorage.removeItem('role');
 
       // Redirect based on role
-      if (role === 'manager') {
+      if (role === 'Manager') {
         window.location.href = '/managerdashboard';
       } else {
-        window.location.href = '/';
+        window.location.href = '/dashboard';
       }
     } catch (err) {
       console.error(err.message);

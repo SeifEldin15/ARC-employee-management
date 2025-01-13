@@ -27,17 +27,14 @@ const Report = () => {
 
   const [weekStart, setWeekStart] = useState('')
   const [weekEnd, setWeekEnd] = useState('')
-  const [srvInputs, setSrvInputs] = useState({})
+  const [srvInput, setSrvInput] = useState('')
   const [hourInputs, setHourInputs] = useState({})
 
   const handleSubmit = async () => {
     const formattedData = {
       workWeek: weekStart,
       year: new Date(weekStart).getFullYear().toString(),
-      SVR_category: days.map(day => ({
-        SVR: srvInputs[day] || '',
-        day: day.toLowerCase()
-      })),
+      SVR: srvInput,
       tasks: days.flatMap(day =>
         activities.slice(0, -1).map(activity => ({
           category: activity.toLowerCase(),
@@ -105,7 +102,15 @@ const Report = () => {
                 <thead>
                   <tr className="border-b">
                     <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">Day</th>
-                    <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">SRV#</th>
+                    <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
+                      <input 
+                        type="text" 
+                        value={srvInput}
+                        onChange={(e) => setSrvInput(e.target.value)}
+                        placeholder="Enter SRV#" 
+                        className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
+                      />
+                    </th>
                     {[...Array(numberOfColumns)].map((_, index) => (
                       <th key={index} className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
                         <select className="w-full bg-transparent outline-none">
@@ -129,15 +134,7 @@ const Report = () => {
                   {days.map((day) => (
                     <tr key={day} className="border-b">
                       <td className="py-2 px-4 text-sm text-gray-600">{day}</td>
-                      <td className="py-2 px-4">
-                        <input 
-                          type="text" 
-                          value={srvInputs[day] || ''}
-                          onChange={(e) => setSrvInputs(prev => ({...prev, [day]: e.target.value}))}
-                          placeholder="Enter SRV#" 
-                          className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
-                        />
-                      </td>
+                      <td className="py-2 px-4 text-sm text-gray-600">{srvInput}</td>
                       {[...Array(numberOfColumns)].map((_, index) => (
                         <td key={index} className="py-2 px-4">
                           <input 

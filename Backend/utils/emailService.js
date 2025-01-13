@@ -14,7 +14,7 @@ export const sendReminderEmail = async (employeeEmail, missingWeeks) => {
         from: EMAIL_USER,
         to: employeeEmail,
         subject: 'Missing Utilization Reports Reminder',
-        text: `You have missing utilization reports for the following weeks: ${missingWeeks}. Please submit them as soon as possible.`
+        text: `You have missing utilization reports for the following weeks: WW${missingWeeks}. Please submit them as soon as possible.`
     };
 
     try {

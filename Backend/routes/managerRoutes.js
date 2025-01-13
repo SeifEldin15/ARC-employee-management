@@ -9,8 +9,8 @@ const router = express.Router();
 
 router.get('/dashboard', authMiddleware , getManagerDashboard);
 
-router.get('/contracts',authMiddleware , getContracts);
-router.post('/contracts', authMiddleware ,createContract);
+router.get('/contracts', authMiddleware, getContracts);
+router.post('/contracts', authMiddleware, createContract);
 router.delete('/contracts/:id', authMiddleware, deleteContract);
 
 router.get('/team', authMiddleware, getManagerTeam);

@@ -66,7 +66,7 @@ export default function TeamPage() {
                   <div className="flex flex-col items-center justify-center flex-grow">
                     <h3 className="font-medium text-center text-sm">{member.name}</h3>
                     <div className="flex justify-center mt-2">
-                      <p className="text-xs text-gray-600 bg-gray-100 rounded px-2 py-0.5 inline-block">
+                      <p className="text-xs text-gray-900 bg-gray-100 rounded px-2 py-0.5 inline-block">
                         {member.title}
                       </p>
                     </div>

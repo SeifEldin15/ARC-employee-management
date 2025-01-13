@@ -1,7 +1,7 @@
 import express from 'express';
 import { getManagerDashboard } from '../controllers/MDes_Controller.js';
 import { getManagerTeam , addManagerTeamMember , deleteManagerTeamMember} from '../controllers/teamController.js';
-import { createContract, deleteContract , getContracts } from '../controllers/contractController.js';
+import { createContract, deleteContract , getContracts , getContractDetails } from '../controllers/contractController.js';
 import  authMiddleware  from '../middleware/authMiddleware.js';
 
 
@@ -10,6 +10,8 @@ const router = express.Router();
 router.get('/dashboard', authMiddleware , getManagerDashboard);
 
 router.get('/contracts',authMiddleware , getContracts);
+router.get('/:contractId/details', authMiddleware, getContractDetails );
+
 router.post('/contracts', authMiddleware ,createContract);
 router.delete('/contracts/:id', authMiddleware, deleteContract);
 

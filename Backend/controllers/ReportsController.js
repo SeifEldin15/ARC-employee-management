@@ -148,7 +148,7 @@ export const submitUtilization = async (req, res) => {
 export const submitCSR = async (req, res) => {
     try {
         const {
-            spvNumber,
+            srvNumber,
             serviceEngineer,
             WorkWeekNumber,
             weekEndDate,
@@ -197,7 +197,7 @@ export const submitCSR = async (req, res) => {
 
         const csr = new CSR({
             employeeId,
-            spvNumber,
+            srvNumber,
             serviceEngineer,
             WorkWeekNumber,
             weekEndDate,
@@ -233,7 +233,7 @@ export const submitCSR = async (req, res) => {
         // Render HTML template
         const templatePath = path.join(__dirname, './templates/csrTemplate.ejs');
         const html = await ejs.renderFile(templatePath, {
-            spvNumber,
+            srvNumber,
             serviceEngineer,
             workWeek: WorkWeekNumber,
             weekEndDate,
@@ -266,7 +266,7 @@ export const submitCSR = async (req, res) => {
                 fs.mkdirSync(pdfDirectory, { recursive: true });
             }
         
-            pdfPath = path.join(pdfDirectory, `WW${WorkWeekNumber}_${spvNumber}_${serviceEngineer}.pdf`);
+            pdfPath = path.join(pdfDirectory, `WW${WorkWeekNumber}_${srvNumber}_${serviceEngineer}.pdf`);
         
             const browser = await puppeteer.launch({
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],

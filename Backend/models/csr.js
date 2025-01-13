@@ -32,7 +32,7 @@ const weeklyTaskSchema = new mongoose.Schema({
 const csrSchema = new mongoose.Schema({
     employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     companyId : { type: mongoose.Schema.Types.ObjectId, ref: 'Company' , required: true  },
-    spvNumber: { type: String, required: true },
+    srvNumber: { type: String, required: true },
     serviceEngineer: { type: String, required: true },
     WorkWeekNumber: { type: Number, required: true },
     weekEndDate: { type: Date, required: true },

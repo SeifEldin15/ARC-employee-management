@@ -1,9 +1,73 @@
 'use client'
+import { useState } from 'react'
 import Sidebar from '@/components/Sidebar'
 
 const Report = () => {
+  // Define number of columns we want
+  const numberOfColumns = 4;
+  
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-  const activities = ['Training', 'Development', 'Testing', 'Select Activity']
+  const activities = [
+    'Travel',
+    'Paid Service',
+    'Contract',
+    'Warranty',
+    'Install',
+    'Mfg Support',
+    'Goodwill Customer Visits',
+    'Training',
+    'Received/Given',
+    'Admin',
+    'Tech Support',
+    'CFT Project',
+    'Idle Time/PTO',
+    'Holiday',
+    'Select Activity'
+  ]
+
+  const [weekStart, setWeekStart] = useState('')
+  const [weekEnd, setWeekEnd] = useState('')
+  const [srvInputs, setSrvInputs] = useState({})
+  const [hourInputs, setHourInputs] = useState({})
+
+  const handleSubmit = async () => {
+    const formattedData = {
+      workWeek: weekStart,
+      year: new Date(weekStart).getFullYear().toString(),
+      SVR_category: days.map(day => ({
+        SVR: srvInputs[day] || '',
+        day: day.toLowerCase()
+      })),
+      tasks: days.flatMap(day =>
+        activities.slice(0, -1).map(activity => ({
+          category: activity.toLowerCase(),
+          hours: hourInputs[`${day}-${activity}`] || '',
+          day: day
+        }))
+      )
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/employee/utilization', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        credentials: 'include',
+        body: JSON.stringify(formattedData)
+      })
+      
+      if (response.ok) {
+        alert('Report submitted successfully!')
+      } else {
+        alert('Failed to submit report')
+      }
+    } catch (error) {
+      console.error('Error submitting report:', error)
+      alert('Error submitting report')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F6FA]">
@@ -19,16 +83,18 @@ const Report = () => {
                 <label className="text-sm text-gray-600">Week Starting</label>
                 <input 
                   type="date" 
+                  value={weekStart}
+                  onChange={(e) => setWeekStart(e.target.value)}
                   className="border border-gray-200 rounded px-3 py-1.5 text-sm bg-white" 
-                  placeholder="mm/dd/yyyy"
                 />
               </div>
               <div className="flex items-center gap-3">
                 <label className="text-sm text-gray-600">Week Ending</label>
                 <input 
                   type="date" 
+                  value={weekEnd}
+                  onChange={(e) => setWeekEnd(e.target.value)}
                   className="border border-gray-200 rounded px-3 py-1.5 text-sm bg-white" 
-                  placeholder="mm/dd/yyyy"
                 />
               </div>
             </div>
@@ -40,10 +106,13 @@ const Report = () => {
                   <tr className="border-b">
                     <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">Day</th>
                     <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">SRV#</th>
-                    {activities.map((activity) => (
-                      <th key={activity} className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
+                    {[...Array(numberOfColumns)].map((_, index) => (
+                      <th key={index} className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
                         <select className="w-full bg-transparent outline-none">
-                          <option>{activity}</option>
+                          <option value="">Select Activity</option>
+                          {activities.slice(0, -1).map(activity => (
+                            <option key={activity} value={activity}>{activity}</option>
+                          ))}
                         </select>
                       </th>
                     ))}
@@ -63,15 +132,21 @@ const Report = () => {
                       <td className="py-2 px-4">
                         <input 
                           type="text" 
+                          value={srvInputs[day] || ''}
+                          onChange={(e) => setSrvInputs(prev => ({...prev, [day]: e.target.value}))}
                           placeholder="Enter SRV#" 
                           className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
                         />
                       </td>
-                      {activities.map((activity) => (
-                        <td key={activity} className="py-2 px-4">
+                      {[...Array(numberOfColumns)].map((_, index) => (
+                        <td key={index} className="py-2 px-4">
                           <input 
                             type="number" 
-                            defaultValue="0.0" 
+                            value={hourInputs[`${day}-${index}`] || '0.0'}
+                            onChange={(e) => setHourInputs(prev => ({
+                              ...prev, 
+                              [`${day}-${index}`]: e.target.value
+                            }))}
                             className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
                           />
                         </td>
@@ -92,7 +167,10 @@ const Report = () => {
 
             {/* Submit Button */}
             <div className="mt-8 flex justify-center">
-              <button className="bg-green-500 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-green-600">
+              <button 
+                onClick={handleSubmit}
+                className="bg-green-500 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-green-600"
+              >
                 Submit Report
               </button>
             </div>

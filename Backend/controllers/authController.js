@@ -4,10 +4,23 @@ import {JWT_SECRET , NODE_ENV } from '../config/env.js'
 import bcrypt from 'bcrypt' ;
 
 export const login = async (req, res) => {
+    console.log('Login request received:', req.body);
+    
     const { email, password } = req.body;
+    
+    // Add validation for required fields
+    if (!email || !password) {
+        console.log('Missing required fields:', { email: !!email, password: !!password });
+        return res.status(400).json({ 
+            message: 'Email and password are required',
+            details: { email: !email, password: !password }
+        });
+    }
+
     try {
         const user = await User.findOne({ email });
         if (!user) {
+            console.log(`Login attempt failed: No user found for email ${email}`);
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 

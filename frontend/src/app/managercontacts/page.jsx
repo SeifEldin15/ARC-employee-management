@@ -8,18 +8,40 @@ const ManagerContacts = () => {
   useEffect(() => {
     const fetchContracts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/manager/contracts');
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch('http://localhost:5000/api/manager/contracts', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Check content type
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("API didn't return JSON");
+        }
+
         const data = await response.json();
-        // Transform the API data to match our component's structure
-        const transformedData = data.map(contract => ({
+        const contractsArray = Array.isArray(data) ? data : (data.contracts || []);
+        
+        const transformedData = contractsArray.map(contract => ({
           company: contract.customer,
           type: contract.serviceType,
           hours: contract.contractHours,
-          total: 100 // You might want to adjust this based on your needs
+          total: 100
         }));
         setContracts(transformedData);
       } catch (error) {
-        console.error('Error fetching contracts:', error);
+        console.error('Error fetching data:', error);
+        setContracts([]); // Set empty array on error
       }
     };
 
@@ -27,8 +49,8 @@ const ManagerContacts = () => {
   }, []);
 
   const getProgressColor = (hours) => {
-    if (hours >= 70) return 'bg-green-500'
-    if (hours >= 30) return 'bg-orange-500'
+    if (hours >= 70) return 'bg-emerald-500'
+    if (hours >= 30) return 'bg-orange-400'
     return 'bg-red-500'
   }
 
@@ -59,14 +81,14 @@ const ManagerContacts = () => {
                       {contract.type}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div className="flex items-center gap-2 w-full">
+                    <div className="relative flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
                       <div
-                        className={`${getProgressColor(contract.hours)} h-2 rounded-full`}
-                        style={{ width: `${contract.hours}%` }}
+                        className={`absolute top-0 left-0 ${getProgressColor(contract.hours)} h-full rounded-full transition-all duration-300`}
+                        style={{ width: `${Math.min(contract.hours, 100)}%` }}
                       />
                     </div>
-                    <span className="text-sm text-gray-600 whitespace-nowrap">
+                    <span className="text-sm text-gray-600 whitespace-nowrap min-w-[90px]">
                       {contract.hours} / {contract.total} hours
                     </span>
                   </div>

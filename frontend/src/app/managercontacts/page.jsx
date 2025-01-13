@@ -63,25 +63,25 @@ const ManagerContacts = () => {
             <h1 className="text-2xl font-semibold text-gray-700 mb-6">Active Contracts</h1>
             
             <div className="bg-white rounded-lg shadow-md">
-              <div className="grid grid-cols-3 p-4 border-b bg-gray-50">
-                <div className="text-sm text-gray-600">Company Name</div>
-                <div className="text-sm text-gray-600">Contract Type</div>
-                <div className="text-sm text-gray-600">Remaining Hours</div>
+              <div className="grid grid-cols-12 p-4 border-b bg-gray-50">
+                <div className="text-sm text-gray-600 col-span-3">Company Name</div>
+                <div className="text-sm text-gray-600 col-span-3">Contract Type</div>
+                <div className="text-sm text-gray-600 col-span-6">Remaining Hours</div>
               </div>
 
               {contracts.map((contract, index) => (
-                <div key={index} className="grid grid-cols-3 p-4 border-b last:border-b-0 items-center">
-                  <div className="text-blue-600 hover:text-blue-800 cursor-pointer">
+                <div key={index} className="grid grid-cols-12 p-4 border-b last:border-b-0 items-center">
+                  <div className="text-blue-600 hover:text-blue-800 cursor-pointer col-span-3">
                     {contract.company}
                   </div>
-                  <div>
+                  <div className="col-span-3">
                     <span className={`px-3 py-1 rounded-full text-sm ${
                       contract.type === 'Service' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
                     }`}>
                       {contract.type}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 w-full">
+                  <div className="flex items-center gap-2 w-full col-span-6">
                     <div className="relative flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
                       <div
                         className={`absolute top-0 left-0 ${getProgressColor(contract.hours)} h-full rounded-full transition-all duration-300`}

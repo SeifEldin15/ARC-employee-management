@@ -1,4 +1,5 @@
 'use client'
+import Sidebar from '@/components/Sidebar';
 
 const ManagerContacts = () => {
   const contracts = [
@@ -16,41 +17,48 @@ const ManagerContacts = () => {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-semibold text-gray-700 mb-6 text-center">Active Contracts</h1>
-      
-      <div className="bg-white rounded-lg shadow-md">
-        <div className="grid grid-cols-3 p-4 border-b bg-gray-50">
-          <div className="text-sm text-gray-600">Company Name</div>
-          <div className="text-sm text-gray-600">Contract Type</div>
-          <div className="text-sm text-gray-600">Remaining Hours</div>
-        </div>
-
-        {contracts.map((contract, index) => (
-          <div key={index} className="grid grid-cols-3 p-4 border-b last:border-b-0 items-center">
-            <div className="text-blue-600 hover:text-blue-800 cursor-pointer">
-              {contract.company}
-            </div>
-            <div>
-              <span className={`px-3 py-1 rounded-full text-sm ${
-                contract.type === 'Service' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
-              }`}>
-                {contract.type}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div
-                  className={`${getProgressColor(contract.hours)} h-2 rounded-full`}
-                  style={{ width: `${contract.hours}%` }}
-                />
+    <div className="min-h-screen">
+      <Sidebar />
+      <div className="md:ml-64 flex-1">
+        <div className="md:p-8 p-4 pt-20 md:pt-8">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-2xl font-semibold text-gray-700 mb-6">Active Contracts</h1>
+            
+            <div className="bg-white rounded-lg shadow-md">
+              <div className="grid grid-cols-3 p-4 border-b bg-gray-50">
+                <div className="text-sm text-gray-600">Company Name</div>
+                <div className="text-sm text-gray-600">Contract Type</div>
+                <div className="text-sm text-gray-600">Remaining Hours</div>
               </div>
-              <span className="text-sm text-gray-600 whitespace-nowrap">
-                {contract.hours} / {contract.total} hours
-              </span>
+
+              {contracts.map((contract, index) => (
+                <div key={index} className="grid grid-cols-3 p-4 border-b last:border-b-0 items-center">
+                  <div className="text-blue-600 hover:text-blue-800 cursor-pointer">
+                    {contract.company}
+                  </div>
+                  <div>
+                    <span className={`px-3 py-1 rounded-full text-sm ${
+                      contract.type === 'Service' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {contract.type}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`${getProgressColor(contract.hours)} h-2 rounded-full`}
+                        style={{ width: `${contract.hours}%` }}
+                      />
+                    </div>
+                    <span className="text-sm text-gray-600 whitespace-nowrap">
+                      {contract.hours} / {contract.total} hours
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   )

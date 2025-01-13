@@ -1,14 +1,30 @@
 'use client'
+import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 
 const ManagerContacts = () => {
-  const contracts = [
-    { company: 'TechCorp Solutions', type: 'Service', hours: 65, total: 100 },
-    { company: 'Innovate Systems', type: 'PM', hours: 42, total: 100 },
-    { company: 'Global Manufacturing Inc', type: 'Service', hours: 88, total: 100 },
-    { company: 'DataFlow Analytics', type: 'PM', hours: 15, total: 100 },
-    { company: 'Precision Industries', type: 'Service', hours: 93, total: 100 },
-  ]
+  const [contracts, setContracts] = useState([]);
+
+  useEffect(() => {
+    const fetchContracts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/manager/contracts');
+        const data = await response.json();
+        // Transform the API data to match our component's structure
+        const transformedData = data.map(contract => ({
+          company: contract.customer,
+          type: contract.serviceType,
+          hours: contract.contractHours,
+          total: 100 // You might want to adjust this based on your needs
+        }));
+        setContracts(transformedData);
+      } catch (error) {
+        console.error('Error fetching contracts:', error);
+      }
+    };
+
+    fetchContracts();
+  }, []);
 
   const getProgressColor = (hours) => {
     if (hours >= 70) return 'bg-green-500'

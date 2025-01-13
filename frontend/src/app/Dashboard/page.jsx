@@ -25,15 +25,15 @@ export default function DashboardPage() {
               color="#2196F3"
             />
             <ActivityRects 
-              value="92%" 
-              subLabel="+2%" 
-              label="CURRENT UTILIZATION"
-              color="#4CAF50"
+              value="2"
+              label="Missing Reports"
+              subLabel="Reports"
+              color="#FF5252"
             />
             <ActivityRects 
-              value="4" 
-              subLabel="Projects" 
-              label="ACTIVE PROJECTS"
+              value="85%"
+              label="Target Utilization"
+              subLabel="Monthly"
               color="#2196F3"
             />
           </main>

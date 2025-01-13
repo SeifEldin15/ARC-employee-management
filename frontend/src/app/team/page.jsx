@@ -1,26 +1,43 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BsTelephoneFill } from 'react-icons/bs';
 import { MdEmail } from 'react-icons/md';
 import Sidebar from '@/components/Sidebar';
 
 export default function TeamPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const teamMembers = {
-    'US-EAST': [
-      { initials: 'EG', name: 'Elizabeth Garcia', title: 'FSE II', phone: '(555) 012-3456', email: 'elizabeth.garcia@company.com' },
-      { initials: 'JW', name: 'James Wilson', title: 'FSE IV', phone: '(555) 111-2222', email: 'james.wilson@company.com' },
-      { initials: 'LA', name: 'Lisa Anderson', title: 'FSE III', phone: '(555) 678-9012', email: 'lisa.anderson@company.com' },
-      { initials: 'SJ', name: 'Sarah Johnson', title: 'FSE II', phone: '(555) 234-5678', email: 'sarah.johnson@company.com' },
-    ],
-    'US-WEST': [
-      // ... similar structure for US-WEST members
-    ],
-    'EUROPE': [
-      // ... similar structure for EUROPE members
-    ],
-  };
+  const [teamMembers, setTeamMembers] = useState({});
+
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/manager/team');
+        const data = await response.json();
+        
+        // Transform the flat array into grouped object by region
+        const groupedMembers = data.reduce((acc, member) => {
+          const region = member.Region;
+          if (!acc[region]) {
+            acc[region] = [];
+          }
+          acc[region].push({
+            initials: member.name.split(' ').map(n => n[0]).join(''),
+            name: member.name,
+            title: member.job_title,
+            phone: member.phone,
+            email: member.email,
+          });
+          return acc;
+        }, {});
+        
+        setTeamMembers(groupedMembers);
+      } catch (error) {
+        console.error('Error fetching team members:', error);
+      }
+    };
+
+    fetchTeamMembers();
+  }, []);
 
   const filteredTeamMembers = Object.entries(teamMembers).reduce((acc, [region, members]) => {
     const filteredMembers = members.filter(member => 

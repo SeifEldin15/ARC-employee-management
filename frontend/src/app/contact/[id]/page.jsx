@@ -45,7 +45,7 @@ export default function DashboardPage() {
       } catch (error) {
         console.error('Error fetching company data:', error);
         if (error.response?.status === 401) {
-          window.location.href = '/login';
+          window.location.href = '/';
         }
       }
     };

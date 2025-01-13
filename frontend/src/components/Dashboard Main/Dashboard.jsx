@@ -35,7 +35,7 @@ const Dashboard = () => {
         
         // Check if token exists
         if (!token) {
-          // window.location.href = '/login';
+          // window.location.href = '/';
           return;
         }
 
@@ -54,7 +54,7 @@ const Dashboard = () => {
         if (err.response?.status === 401) {
           // Redirect to login if unauthorized
           localStorage.removeItem('token'); // Clear invalid token
-          // window.location.href = '/login';
+          // window.location.href = '/';
         }
         setError(err.response?.data?.message || 'Failed to fetch reports');
       } finally {

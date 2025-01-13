@@ -20,7 +20,7 @@ const ContactsDashboard = () => {
         
         if (!token) {
           console.log('No token found in localStorage');
-          window.location.href = '/login';
+          window.location.href = '/';
           return;
         }
 
@@ -39,7 +39,7 @@ const ContactsDashboard = () => {
         if (!response.ok) {
           if (response.status === 401) {
             console.log('Unauthorized access - redirecting to login');
-            window.location.href = '/login';
+            window.location.href = '/';
             return;
           }
           throw new Error('Failed to fetch companies');

@@ -14,6 +14,30 @@ import {submitReport } from '../utils/submitReport.js'
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+export const getPastVisitForCompany = async (req, res) => {
+    
+    const { companyId } = req.params;
+    
+    const employeeId = req.user._id;
+    try {
+        const csrData = await CSR.find({ companyId , employeeId }).select(
+            'serviceEngineer weekEndDate totals.totalWeekHours purposeOfVisit'
+        );
+
+        const formattedData = csrData.map((item) => ({
+            serviceEngineer: item.serviceEngineer,
+            weekStartDate: item.weekEndDate.toISOString().split('T')[0], 
+            totalHours: item.totals.totalWeekHours,
+            purposeOfVisit: item.purposeOfVisit,
+        }));
+
+        res.status(200).json(formattedData);
+    } catch (err) {
+        console.error('Error fetching CSR data for company:', err);
+        res.status(500).json({ error: 'Failed to fetch CSR data for company' });
+    }
+};
+
 export const getEmployeeReports = async (req, res) => {
     try {
         const employeeId = req.user._id.toString(); 

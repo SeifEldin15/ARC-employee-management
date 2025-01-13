@@ -1,26 +1,44 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '@/components/Sidebar'
+import axios from 'axios'
 
 export default function MyReports() {
-  const reports = [
-    {
-      id: 49,
-      title: 'Work Week 49',
-      dateRange: '11/27/2024 - 12/3/2024',
-      hasCSV: true,
-      hasUtilization: true,
-    },
-    {
-      id: 48,
-      title: 'Work Week 48',
-      dateRange: '11/20/2024 - 11/26/2024',
-      hasCSV: true,
-      hasUtilization: true,
-    },
-    // ... add more reports as needed
-  ]
+  const [reports, setReports] = useState([])
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/employee/reports', {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        
+        // Transform API data to match our component's structure
+        const formattedReports = response.data.map(report => ({
+          id: `week-${report.weekNumber}-${report.dateRange}`,
+          title: `Work Week ${report.weekNumber}`,
+          dateRange: report.dateRange,
+          hasCSV: Boolean(report.csrReport),
+          hasUtilization: Boolean(report.utilizationReport)
+        }))
+        
+        setReports(formattedReports)
+      } catch (error) {
+        console.error('Error fetching reports:', error)
+        if (error.response?.status === 401) {
+          window.location.href = '/';
+        }
+      }
+    }
+
+    fetchReports()
+  }, [])
 
   return (
     <>

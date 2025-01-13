@@ -1,0 +1,89 @@
+'use client';
+import { useParams } from 'next/navigation';
+import Sidebar from '@/components/Sidebar';
+import LocationSection from '@/components/Contact/LocationSection';
+import Link from 'next/link';
+import ContactSection from '@/components/Contact/ContactSection';
+import Table from '@/components/Contact/Table';
+import { useEffect, useState } from 'react';
+
+export default function DashboardPage() {
+  const params = useParams();
+  const id = params.id;
+  const [companyData, setCompanyData] = useState(null);
+
+  const handleContactAdded = (newContact) => {
+    console.log('Previous state:', companyData);
+    console.log('New contact:', newContact);
+    
+    setCompanyData(prev => {
+      const updatedContacts = prev.details.contacts ? [...prev.details.contacts, newContact] : [newContact];
+      return {
+        ...prev,
+        details: {
+          ...prev.details,
+          contacts: updatedContacts
+        }
+      };
+    });
+  };
+
+  useEffect(() => {
+    const fetchCompanyData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/company/${id}`, {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        setCompanyData(data);
+      } catch (error) {
+        console.error('Error fetching company data:', error);
+        if (error.response?.status === 401) {
+          window.location.href = '/';
+        }
+      }
+    };
+
+    fetchCompanyData();
+  }, [id]);
+
+  return (
+    <div className="min-h-screen">
+      <Sidebar />
+      <div className="md:ml-64 flex-1">
+        <div className="md:p-8 p-4 pt-20 md:pt-8">
+          {/* Back button container */}
+          <div className="flex justify-center mb-8">
+            <Link 
+              href="/contacts" 
+              className="text-gray-600 hover:text-gray-800 inline-block text-base border border-gray-200 rounded px-4 py-2"
+            >
+              ← Back to Contacts
+            </Link>
+          </div>
+
+          {/* Company header */}
+          <div className="text-center mb-8 max-w-4xl mx-auto">
+            <div className="rounded-lg">
+              <h1 className="text-3xl font-semibold text-gray-800">{companyData?.company || 'Loading...'}</h1>
+            </div>
+          </div>
+
+          <LocationSection address={companyData?.address} region={companyData?.region} />
+          <ContactSection 
+            contacts={companyData?.details?.contacts || []} 
+            companyId={id}
+            onContactAdded={handleContactAdded}
+          />
+          <Table tools={companyData?.details?.tools_installed || []} />
+        </div>
+      </div>
+    </div>
+  );
+}

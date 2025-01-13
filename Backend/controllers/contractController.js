@@ -20,7 +20,16 @@ export const createContract = async (req, res) => {
         await newContract.save();
         res.status(201).json({ newContract });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating contract', error: error.message });
+        console.error('Contract creation failed:', {
+            error: error.message,
+            stack: error.stack,
+            requestBody: req.body
+        });
+        res.status(500).json({ 
+            message: 'Error creating contract', 
+            details: error.message,
+            code: error.code || 'UNKNOWN_ERROR'
+        });
     }
 };
 
@@ -33,7 +42,16 @@ export const deleteContract = async (req, res) => {
 
         res.status(200).json({ message: 'Contract deleted successfully'});
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting contract', error: error.message });
+        console.error('Contract deletion failed:', {
+            error: error.message,
+            stack: error.stack,
+            contractId: req.params.id
+        });
+        res.status(500).json({ 
+            message: 'Error deleting contract', 
+            details: error.message,
+            code: error.code || 'UNKNOWN_ERROR'
+        });
     }
 };
 
@@ -89,6 +107,8 @@ export const getContractDetails = async (req, res) => {
             usedHours,
         });
     } catch (error) {
+
         res.status(500).json({ message: 'Error fetching contract details', error: error.message });
+
     }
 };

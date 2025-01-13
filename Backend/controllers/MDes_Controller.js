@@ -5,6 +5,7 @@ import Workweek from '../models/workweek.js';
 export const getManagerDashboard = async (req, res) => {
     try {
         const managerId = req.user._id;
+
         const employees = await User.find({ managerId, role: 'Employee' }).select("name email");
 
         const allWeeks = await Workweek.find().select('weekNumber startDate endDate pendingReports');

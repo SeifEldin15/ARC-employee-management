@@ -39,6 +39,10 @@ export const getPastVisitForCompany = async (req, res) => {
 };
 
 export const getEmployeeReports = async (req, res) => {
+    console.log('[getEmployeeReports] Request:', {
+        employeeId: req.user._id,
+        timestamp: new Date().toISOString()
+    });
     try {
         const employeeId = req.user._id.toString(); 
         
@@ -80,13 +84,24 @@ export const getEmployeeReports = async (req, res) => {
 
         res.status(200).json(reports);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching employee reports', error: error.message });
+        console.error('[getEmployeeReports] Error:', error);
+        res.status(500).json({ 
+            message: 'Error fetching employee reports', 
+            error: error.message 
+        });
     }
 };
 
 
 
 export const submitUtilization = async (req, res) => {
+    console.log('[submitUtilization] Request:', {
+        employeeId: req.user._id,
+        workWeek: req.body.WorkWeekNumber,
+        year: req.body.year,
+        timestamp: new Date().toISOString(),
+        body: req.body
+    });
     try {
         const employeeId = req.user._id;
 
@@ -140,12 +155,27 @@ export const submitUtilization = async (req, res) => {
         res.status(200).json({ message: 'Utilization report submitted successfully!' });
 
     } catch (error) {
-        res.status(500).json({ error: 'Error submitting utilization report', details: error.message });
+        console.error('[submitUtilization] Error:', {
+            employeeId: req.user._id,
+            workWeek: req.body.WorkWeekNumber,
+            error: error.message
+        });
+        res.status(500).json({ 
+            error: 'Error submitting utilization report', 
+            details: error.message 
+        });
     }
 };
 
 
 export const submitCSR = async (req, res) => {
+    console.log('[submitCSR] Request:', {
+        employeeId: req.user._id,
+        spvNumber: req.body.spvNumber,
+        workWeek: req.body.WorkWeekNumber,
+        timestamp: new Date().toISOString(),
+        body: req.body
+    });
     try {
         const {
             srvNumber,
@@ -291,8 +321,17 @@ export const submitCSR = async (req, res) => {
     res.status(200).json({ message: 'CSR submitted successfully!', pdfPath });
 
     } catch (error) {
-        console.error('Error submitting CSR:', error);
-        res.status(500).json({ error: 'Error submitting CSR', details: error.message });
+        console.error('[submitCSR] Error:', {
+            employeeId: req.user._id,
+            spvNumber: req.body.spvNumber,
+            workWeek: req.body.WorkWeekNumber,
+            error: error.message,
+            stack: error.stack
+        });
+        res.status(500).json({ 
+            error: 'Error submitting CSR', 
+            details: error.message 
+        });
     }
 };
 

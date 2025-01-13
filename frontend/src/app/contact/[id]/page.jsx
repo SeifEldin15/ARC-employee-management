@@ -12,6 +12,22 @@ export default function DashboardPage() {
   const id = params.id;
   const [companyData, setCompanyData] = useState(null);
 
+  const handleContactAdded = (newContact) => {
+    console.log('Previous state:', companyData);
+    console.log('New contact:', newContact);
+    
+    setCompanyData(prev => {
+      const updatedContacts = prev.details.contacts ? [...prev.details.contacts, newContact] : [newContact];
+      return {
+        ...prev,
+        details: {
+          ...prev.details,
+          contacts: updatedContacts
+        }
+      };
+    });
+  };
+
   useEffect(() => {
     const fetchCompanyData = async () => {
       try {
@@ -63,6 +79,7 @@ export default function DashboardPage() {
           <ContactSection 
             contacts={companyData?.details?.contacts || []} 
             companyId={id}
+            onContactAdded={handleContactAdded}
           />
           <Table tools={companyData?.details?.tools_installed || []} />
         </div>

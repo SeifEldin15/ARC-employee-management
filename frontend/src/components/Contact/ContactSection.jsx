@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaUser, FaEnvelope, FaPhone, FaPlus } from 'react-icons/fa';
 
-const ContactSection = ({ contacts, companyId }) => {
+const ContactSection = ({ contacts, companyId, onContactAdded }) => {
   const userRole = localStorage.getItem('role');
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -38,9 +38,16 @@ const ContactSection = ({ contacts, companyId }) => {
       });
 
       if (response.ok) {
+        const newContact = await response.json();
+        const formattedContact = {
+          _id: newContact._id,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone
+        };
+        onContactAdded(formattedContact);
         setShowModal(false);
         setFormData({ name: '', email: '', phone: '' });
-        // You might want to refresh the contacts list here
       } else {
         const errorData = await response.json();
         console.error('Failed to add contact:', errorData.message);

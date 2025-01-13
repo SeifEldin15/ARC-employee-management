@@ -26,12 +26,19 @@ const Sidebar = () => {
         throw new Error('Logout failed');
       }
 
+      // Get role before clearing localStorage
+      const role = localStorage.getItem('role');
+
       // Clear token and role from localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('role');
 
-      // Redirect to login page
-      window.location.href = '/login';
+      // Redirect based on role
+      if (role === 'manager') {
+        window.location.href = '/managerdashboard';
+      } else {
+        window.location.href = '/';
+      }
     } catch (err) {
       console.error(err.message);
     }

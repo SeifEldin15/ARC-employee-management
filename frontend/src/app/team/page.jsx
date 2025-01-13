@@ -45,9 +45,9 @@ export default function TeamPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name, title, or region..."
-            className="w-64 p-3 border rounded-lg"
+            className="w-56 p-2 border rounded-lg text-sm"
           />
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 whitespace-nowrap">
+          <button className="bg-blue-500 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 whitespace-nowrap text-sm">
             + Add Employee
           </button>
         </div>

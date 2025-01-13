@@ -1,6 +1,8 @@
 import { FaUser, FaEnvelope, FaPhone, FaPlus } from 'react-icons/fa';
 
 const ContactSection = ({ contacts }) => {
+  const userRole = localStorage.getItem('role');
+
   return (
     <div className="max-w-4xl mx-auto p-8 mt-10 shadow-[0_0_8px_rgba(0,0,0,0.15)] rounded-lg">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center mt-8">Contacts</h2>
@@ -24,24 +26,26 @@ const ContactSection = ({ contacts }) => {
           </div>
         ))}
         
-        {/* Add Contact Card */}
-        <div className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:bg-gray-50" 
-             style={{
-               background: 'linear-gradient(90deg, #d1d5db 50%, transparent 50%) repeat-x,linear-gradient(90deg, #d1d5db 50%, transparent 50%) repeat-x,linear-gradient(0deg, #d1d5db 50%, transparent 50%) repeat-y,linear-gradient(0deg, #d1d5db 50%, transparent 50%) repeat-y',
-               backgroundSize: '10px 2px, 10px 2px, 2px 10px, 2px 10px',
-               backgroundPosition: '0 0, 0 100%, 0 0, 100% 0',
-               padding: '24px',
-               backgroundRepeat: 'repeat-x,repeat-x,repeat-y,repeat-y',
-               backgroundColor: 'rgba(37, 99, 235, 0.05)'
-             }}>
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="bg-blue-600 rounded-full p-1.5 mb-3">
-              <FaPlus className="w-4 h-4 text-white" />
+        {/* Add Contact Card - Only show for Managers */}
+        {userRole === 'Manager' && (
+          <div className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:bg-gray-50" 
+               style={{
+                 background: 'linear-gradient(90deg, #d1d5db 50%, transparent 50%) repeat-x,linear-gradient(90deg, #d1d5db 50%, transparent 50%) repeat-x,linear-gradient(0deg, #d1d5db 50%, transparent 50%) repeat-y,linear-gradient(0deg, #d1d5db 50%, transparent 50%) repeat-y',
+                 backgroundSize: '10px 2px, 10px 2px, 2px 10px, 2px 10px',
+                 backgroundPosition: '0 0, 0 100%, 0 0, 100% 0',
+                 padding: '24px',
+                 backgroundRepeat: 'repeat-x,repeat-x,repeat-y,repeat-y',
+                 backgroundColor: 'rgba(37, 99, 235, 0.05)'
+               }}>
+            <div className="flex flex-col items-center justify-center h-full">
+              <div className="bg-blue-600 rounded-full p-1.5 mb-3">
+                <FaPlus className="w-4 h-4 text-white" />
+              </div>
+              <p className="text-blue-600 font-medium mb-2 text-lg">Add Contact</p>
+              <p className="text-sm text-gray-400">Add a new contact to this company</p>
             </div>
-            <p className="text-blue-600 font-medium mb-2 text-lg">Add Contact</p>
-            <p className="text-sm text-gray-400">Add a new contact to this company</p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

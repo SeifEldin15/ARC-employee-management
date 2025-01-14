@@ -4,10 +4,23 @@ import {JWT_SECRET , NODE_ENV } from '../config/env.js'
 import bcrypt from 'bcrypt' ;
 
 export const login = async (req, res) => {
+    console.log('Login request received:', req.body);
+    
     const { email, password } = req.body;
+    
+    // Add validation for required fields
+    if (!email || !password) {
+        console.log('Missing required fields:', { email: !!email, password: !!password });
+        return res.status(400).json({ 
+            message: 'Email and password are required',
+            details: { email: !email, password: !password }
+        });
+    }
+
     try {
         const user = await User.findOne({ email });
         if (!user) {
+            console.log(`Login attempt failed: No user found for email ${email}`);
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
@@ -24,8 +37,6 @@ export const login = async (req, res) => {
             sameSite: 'strict',
             path: '/', 
         });        
-        // const redirectUrl = user.role === 'Manager' ? '/manager/dashboard' : '/employee/dashboard';
-        // res.redirect(redirectUrl);
 
         res.status(200).json({ 
             "token": token ,
@@ -48,6 +59,39 @@ export const logout = (req, res) => {
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error during logout', error: error.message });
+    }
+};
+
+export const changePassword = async (req, res) => {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+
+    if (!oldPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    if (newPassword !== confirmPassword) {
+        return res.status(400).json({ message: 'New password and confirm password do not match' });
+    }
+
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Old password is incorrect' });
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        user.password = hashedNewPassword;
+        await user.save();
+
+        return res.status(200).json({ message: 'Password changed successfully' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 

@@ -1,0 +1,129 @@
+name: Deploy MERN Application
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Debug Info
+      run: |
+        echo "GitHub Workspace: $GITHUB_WORKSPACE"
+        echo "Node Version:"
+        node --version
+        echo "NPM Version:"
+        npm --version
+
+    - name: Test SSH Connection
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        debug: true
+        script: |
+          echo "SSH connection test successful"
+          pwd
+          whoami
+
+    - name: Deploy to Server
+      if: success()
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+        
+          echo "Starting deployment..."
+          PROJECT_DIR="/home/${{ secrets.USERNAME }}/"
+          echo "Creating/accessing project directory: $PROJECT_DIR"
+          mkdir -p $PROJECT_DIR
+          cd $PROJECT_DIR || exit 1
+          
+          # Set up SSH for GitHub (if needed for Git operations)
+          echo "Setting up SSH..."
+          
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+          
+          # Clone repository using HTTPS with token authentication
+          echo "Cloning repository..."
+          if [ ! -d ".git" ]; then
+            git clone https://${{ secrets.GIT_TOKEN }}@github.com/SeifEldin15/ARC-employee-management.git . 
+          else
+            git fetch origin main
+            git reset --hard origin/main
+          fi
+          
+                                  
+          # Backend deployment
+          if [ -d "Backend" ]; then
+            echo "Setting up Backend..."
+            cd Backend
+            rm -rf node_modules
+            rm package-lock.json
+            npm install
+            
+            # Ensure PM2 is installed
+            if ! command -v pm2 &> /dev/null; then
+              echo "Installing PM2..."
+              npm install -g pm2
+            fi
+            
+            # Check if app.js exists
+            if [ -f "app.js" ]; then
+              # Start/restart the application
+              if pm2 list | grep -q "backend"; then
+                echo "Restarting backend service..."
+                pm2 restart backend
+              else
+                echo "Starting backend service..."
+                pm2 start app.js --name "backend"
+              fi
+            else
+              echo "app.js not found in Backend directory!"
+              exit 1
+            fi
+          else
+            echo "Backend directory not found!"
+            exit 1
+          fi
+          
+          # Reload web server if needed
+          if command -v caddy &> /dev/null; then
+            echo "Reloading Caddy..."
+            sudo systemctl reload caddy
+          fi
+          
+          echo "Deployment completed successfully!"
+
+
+    - name: Deployment Status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ Deployment completed successfully!"
+        else
+          echo "❌ Deployment failed!"
+          exit 1
+        fi
+
+env:
+  CI: true
+  NODE_ENV: production

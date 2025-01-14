@@ -112,3 +112,29 @@ export const getContractDetails = async (req, res) => {
 
     }
 };
+
+ 
+
+export const getPastVisitForContract = async (req, res) => {
+    
+    const { srvNumber } = req.params;
+
+    try {
+        const csrData = await CSR.find({ srvNumber }).select(
+            'serviceEngineer weekEndDate totals.totalWeekHours purposeOfVisit'
+        );
+
+        const formattedData = csrData.map((item) => ({
+            serviceEngineer: item.serviceEngineer,
+            weekStartDate: item.weekEndDate.toISOString().split('T')[0], 
+            totalHours: item.totals.totalWeekHours,
+            purposeOfVisit: item.purposeOfVisit,
+        }));
+
+        res.status(200).json(formattedData);
+    } catch (err) {
+        console.error('Error fetching CSR data for company:', err);
+        res.status(500).json({ error: 'Failed to fetch CSR data for company' });
+    }
+};
+

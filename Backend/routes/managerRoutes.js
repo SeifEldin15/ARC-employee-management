@@ -1,7 +1,7 @@
 import express from 'express';
 import { getManagerDashboard } from '../controllers/MDes_Controller.js';
 import { getManagerTeam , addManagerTeamMember , deleteManagerTeamMember , getEmployeeDetails } from '../controllers/teamController.js';
-import { createContract, deleteContract , getContracts , getContractDetails } from '../controllers/contractController.js';
+import { createContract, deleteContract , getContracts , getContractDetails , getPastVisitForContract } from '../controllers/contractController.js';
 import  authMiddleware  from '../middleware/authMiddleware.js';
 
 
@@ -11,6 +11,8 @@ router.get('/dashboard', authMiddleware , getManagerDashboard);
 
 router.get('/contracts',authMiddleware , getContracts);
 router.get('/:contractId/details', authMiddleware, getContractDetails );
+router.get('/:srvNumber/past-visit', authMiddleware, getPastVisitForContract );
+
 
 router.post('/contracts', authMiddleware ,createContract);
 router.delete('/contracts/:id', authMiddleware, deleteContract);

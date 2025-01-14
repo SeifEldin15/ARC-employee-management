@@ -105,13 +105,13 @@ export const submitUtilization = async (req, res) => {
     try {
         const employeeId = req.user._id;
 
-        const { WorkWeekNumber, year, SVR_Category, tasks, serviceEngineer } = req.body;
+        const { WeekNumber, year, SVR_Category, tasks, serviceEngineer } = req.body;
 
         const totalHours = tasks.reduce((sum, task) => sum + task.hours, 0);
 
         const report = new Utilization({
             employeeId,
-            WorkWeekNumber,
+            WeekNumber,
             year,
             SVR_Category,
             tasks,
@@ -122,7 +122,7 @@ export const submitUtilization = async (req, res) => {
 
         const templatePath = path.join(__dirname, './templates/utilizationReport.ejs');
         const html = await ejs.renderFile(templatePath, {
-            WorkWeekNumber,
+            WeekNumber,
             serviceEngineer,
             SVR_Category,
             tasks,
@@ -138,7 +138,7 @@ export const submitUtilization = async (req, res) => {
             fs.mkdirSync(pdfDirectory, { recursive: true });
         }
     
-        pdfPath = path.join(pdfDirectory, `WW${WorkWeekNumber}_${serviceEngineer}.pdf`);
+        pdfPath = path.join(pdfDirectory, `WW${WeekNumber}_${serviceEngineer}.pdf`);
     
         const browser = await puppeteer.launch({
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -148,7 +148,7 @@ export const submitUtilization = async (req, res) => {
         await page.pdf({ path: pdfPath, format: 'A4', printBackground: true });    
         await browser.close();
 
-        submitReport(WorkWeekNumber , employeeId ,"Utilization" , pdfPath )
+        submitReport(WeekNumber , employeeId ,"Utilization" , pdfPath )
 
         await report.save();
 
@@ -157,7 +157,7 @@ export const submitUtilization = async (req, res) => {
     } catch (error) {
         console.error('[submitUtilization] Error:', {
             employeeId: req.user._id,
-            workWeek: req.body.WorkWeekNumber,
+            workWeek: req.body.WeekNumber,
             error: error.message
         });
         res.status(500).json({ 
@@ -169,13 +169,6 @@ export const submitUtilization = async (req, res) => {
 
 
 export const submitCSR = async (req, res) => {
-    console.log('[submitCSR] Request:', {
-        employeeId: req.user._id,
-        spvNumber: req.body.spvNumber,
-        workWeek: req.body.WorkWeekNumber,
-        timestamp: new Date().toISOString(),
-        body: req.body
-    });
     try {
         const {
             srvNumber,

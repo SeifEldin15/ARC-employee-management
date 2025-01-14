@@ -1,6 +1,6 @@
 import express from 'express';
 import { getManagerDashboard } from '../controllers/MDes_Controller.js';
-import { getManagerTeam , addManagerTeamMember , deleteManagerTeamMember , getTeamDetails } from '../controllers/teamController.js';
+import { getManagerTeam , addManagerTeamMember , deleteManagerTeamMember , getEmployeeDetails } from '../controllers/teamController.js';
 import { createContract, deleteContract , getContracts , getContractDetails } from '../controllers/contractController.js';
 import  authMiddleware  from '../middleware/authMiddleware.js';
 
@@ -18,7 +18,7 @@ router.delete('/contracts/:id', authMiddleware, deleteContract);
 router.get('/team', authMiddleware, getManagerTeam);
 router.post('/team',authMiddleware, addManagerTeamMember);
 router.delete('/team/:employeeId', authMiddleware , deleteManagerTeamMember);
-router.get('/:employeeId/details', authMiddleware, getTeamDetails );
+router.get('/team/:employeeId', authMiddleware, getEmployeeDetails );
 
 
 export default router; 

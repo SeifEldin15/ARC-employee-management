@@ -7,48 +7,111 @@ import path from 'path';
 import ejs from 'ejs';
 import puppeteer from 'puppeteer';
 import { fileURLToPath } from 'url';
-
+import {submitReport } from '../utils/submitReport.js'
 
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const getEmployeeReports = async (req, res) => {
+export const getPastVisitForCompany = async (req, res) => {
+    
+    const { companyId } = req.params;
+    
+    const employeeId = req.user._id;
     try {
-        const employeeId = req.user._id;
-        const workweeks = await Workweek.find({}).populate('pendingReports.employeeId');
+        const csrData = await CSR.find({ companyId , employeeId }).select(
+            'serviceEngineer weekEndDate totals.totalWeekHours purposeOfVisit'
+        );
 
-        const reports = await Promise.all(workweeks.map(async (week) => {
-            const employeeReport = week.pendingReports.find(report => report.employeeId.toString() === employeeId);
-            const utilizationReport = employeeReport?.reportTypes.find(rt => rt.type === 'Utilization');
-            const csrReport = employeeReport?.reportTypes.find(rt => rt.type === 'CSR');
-
-            return {
-                weekNumber: week.weekNumber,
-                dateRange: `${week.startDate.toDateString()} - ${week.endDate.toDateString()}`,
-                utilizationReport: utilizationReport ? utilizationReport.pdfPath : 'Not submitted',
-                csrReport: csrReport ? csrReport.pdfPath : 'Not submitted'
-            };
+        const formattedData = csrData.map((item) => ({
+            serviceEngineer: item.serviceEngineer,
+            weekStartDate: item.weekEndDate.toISOString().split('T')[0], 
+            totalHours: item.totals.totalWeekHours,
+            purposeOfVisit: item.purposeOfVisit,
         }));
 
-        res.status(200).json(reports);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching employee reports', error: error.message });
+        res.status(200).json(formattedData);
+    } catch (err) {
+        console.error('Error fetching CSR data for company:', err);
+        res.status(500).json({ error: 'Failed to fetch CSR data for company' });
     }
 };
 
+export const getEmployeeReports = async (req, res) => {
+    console.log('[getEmployeeReports] Request:', {
+        employeeId: req.user._id,
+        timestamp: new Date().toISOString()
+    });
+    try {
+        const employeeId = req.user._id.toString(); 
+        
+        const workweeks = await Workweek.find({})
+            .sort({ weekNumber: 1 })
+
+        const reports = workweeks.map((week) => {
+            const employeeReport = week.pendingReports.find(
+                (report) => report.employeeId?.toString() === employeeId
+            );
+
+            if (!employeeReport) {
+                return {
+                    weekNumber: week.weekNumber,
+                    dateRange: `${new Date(week.startDate).toDateString()} - ${new Date(
+                        week.endDate
+                    ).toDateString()}`,
+                    utilizationReport: 'Not submitted',
+                    csrReport: 'Not submitted',
+                };
+            }
+
+            const utilizationReport = employeeReport.reportTypes.find(
+                (rt) => rt.type === 'Utilization'
+            );
+            const csrReport = employeeReport.reportTypes.find(
+                (rt) => rt.type === 'CSR'
+            );
+
+            return {
+                weekNumber: week.weekNumber,
+                dateRange: `${new Date(week.startDate).toDateString()} - ${new Date(
+                    week.endDate
+                ).toDateString()}`,
+                utilizationReport: utilizationReport?.pdfPath || 'Not submitted',
+                csrReport: csrReport?.pdfPath || 'Not submitted',
+            };
+        });
+
+        res.status(200).json(reports);
+    } catch (error) {
+        console.error('[getEmployeeReports] Error:', error);
+        res.status(500).json({ 
+            message: 'Error fetching employee reports', 
+            error: error.message 
+        });
+    }
+};
+
+
+
 export const submitUtilization = async (req, res) => {
+    console.log('[submitUtilization] Request:', {
+        employeeId: req.user._id,
+        workWeek: req.body.WorkWeekNumber,
+        year: req.body.year,
+        timestamp: new Date().toISOString(),
+        body: req.body
+    });
     try {
         const employeeId = req.user._id;
 
-        const { WorkWeekNumber, year, SVR_Category, tasks, serviceEngineer } = req.body;
+        const { WeekNumber, year, SVR_Category, tasks, serviceEngineer } = req.body;
 
         const totalHours = tasks.reduce((sum, task) => sum + task.hours, 0);
 
         const report = new Utilization({
             employeeId,
-            WorkWeekNumber,
+            WeekNumber,
             year,
             SVR_Category,
             tasks,
@@ -56,47 +119,51 @@ export const submitUtilization = async (req, res) => {
             totalHours
         });
 
+
+        const templatePath = path.join(__dirname, './templates/utilizationReport.ejs');
+        const html = await ejs.renderFile(templatePath, {
+            WeekNumber,
+            serviceEngineer,
+            SVR_Category,
+            tasks,
+            totalHours
+        });
+
+        // Generate PDF using Puppeteer
+        let pdfPath ; 
+        const pdfDirectory = path.join(__dirname, '../data/Utilization_Report/');
+    
+        // Ensure the directory exists
+        if (!fs.existsSync(pdfDirectory)) {
+            fs.mkdirSync(pdfDirectory, { recursive: true });
+        }
+    
+        pdfPath = path.join(pdfDirectory, `WW${WeekNumber}_${serviceEngineer}.pdf`);
+    
+        const browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });   
+        const page = await browser.newPage();
+        await page.setContent(html, { waitUntil: 'domcontentloaded' });
+        await page.pdf({ path: pdfPath, format: 'A4', printBackground: true });    
+        await browser.close();
+
+        submitReport(WeekNumber , employeeId ,"Utilization" , pdfPath )
+
         await report.save();
 
-        // const templatePath = path.join(__dirname, './templates/utilizationReport.ejs');
-        // const html = await ejs.renderFile(templatePath, {
-        //     WorkWeekNumber,
-        //     serviceEngineer,
-        //     tasks,
-        //     year
-        // });
-
-        // // Generate the PDF using Puppeteer
-        // const browser = await puppeteer.launch();
-        // const page = await browser.newPage();
-        // await page.setContent(html, { waitUntil: 'domcontentloaded' });
-        // const pdfPath = `../data/Utilization_Report/${WorkWeekNumber}_${serviceEngineer}.pdf`;
-        // await page.pdf({ path: pdfPath, format: 'A4', printBackground: true });
-        // await browser.close();
-
-        // // Assuming the pendingReports for this week are being managed elsewhere
-        // // Update the report for the employee if applicable
-        // const workweek = await Workweek.findOne({ weekNumber: WorkWeekNumber });
-        // if (!workweek) return res.status(400).json({ error: 'WorkWeek not found' });
-
-        // const employeeReport = workweek.pendingReports.find(
-        //     (report) => report.employeeId.toString() === employeeId
-        // );
-
-        // if (employeeReport) {
-        //     const utilizationReport = employeeReport.reportTypes.find(rt => rt.type === 'Utilization');
-        //     if (utilizationReport) {
-        //         utilizationReport.pdfPath = pdfPath;
-        //         utilizationReport.submittedAt = new Date();
-        //     }
-        // }
-
-        // // Save updated workweek
-        // await workweek.save();
-
         res.status(200).json({ message: 'Utilization report submitted successfully!' });
+
     } catch (error) {
-        res.status(500).json({ error: 'Error submitting utilization report', details: error.message });
+        console.error('[submitUtilization] Error:', {
+            employeeId: req.user._id,
+            workWeek: req.body.WeekNumber,
+            error: error.message
+        });
+        res.status(500).json({ 
+            error: 'Error submitting utilization report', 
+            details: error.message 
+        });
     }
 };
 
@@ -104,11 +171,12 @@ export const submitUtilization = async (req, res) => {
 export const submitCSR = async (req, res) => {
     try {
         const {
-            spvNumber,
+            srvNumber,
             serviceEngineer,
             WorkWeekNumber,
             weekEndDate,
             customer,
+            companyId,
             address,
             contact,
             email,
@@ -152,11 +220,12 @@ export const submitCSR = async (req, res) => {
 
         const csr = new CSR({
             employeeId,
-            spvNumber,
+            srvNumber,
             serviceEngineer,
             WorkWeekNumber,
             weekEndDate,
             customer,
+            companyId,
             address,
             contact,
             email,
@@ -187,9 +256,9 @@ export const submitCSR = async (req, res) => {
         // Render HTML template
         const templatePath = path.join(__dirname, './templates/csrTemplate.ejs');
         const html = await ejs.renderFile(templatePath, {
-            spvNumber,
+            srvNumber,
             serviceEngineer,
-            workWeek: WorkWeekNumber, // Map WorkWeekNumber to workWeek
+            workWeek: WorkWeekNumber,
             weekEndDate,
             customer,
             address,
@@ -209,6 +278,8 @@ export const submitCSR = async (req, res) => {
             returnVisitRequired,
         });
         var pdfPath ;
+
+
     // Generate PDF using Puppeteer
         try {
             const pdfDirectory = path.join(__dirname, '../data/CSR_Report');
@@ -218,7 +289,7 @@ export const submitCSR = async (req, res) => {
                 fs.mkdirSync(pdfDirectory, { recursive: true });
             }
         
-            pdfPath = path.join(pdfDirectory, `${WorkWeekNumber}_${spvNumber}_${serviceEngineer}.pdf`);
+            pdfPath = path.join(pdfDirectory, `WW${WorkWeekNumber}_${srvNumber}_${serviceEngineer}.pdf`);
         
             const browser = await puppeteer.launch({
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -235,24 +306,7 @@ export const submitCSR = async (req, res) => {
             res.status(500).json({ error: 'Error generating PDF', details: error.message });
         }
 
-
-        const workweek = await Workweek.findOne({ weekNumber: WorkWeekNumber });
-        const employeeReport = workweek.pendingReports.find(
-            (report) => report.employeeId.toString() === employeeId
-        );
-        
-        console.log(employeeReport)
-        if (employeeReport) {
-            const CSR_Report = employeeReport.reportTypes.find(rt => rt.type === 'CSR');
-            console.log(CSR_Report)
-            if (CSR_Report) {
-                CSR_Report.pdfPath = pdfPath;
-                CSR_Report.submittedAt = new Date();
-            }
-        }
-
-        // Save updated workweek
-        await workweek.save();
+        submitReport(WorkWeekNumber , employeeId ,"CSR" , pdfPath )
 
         csr.pdfPath = pdfPath;
         await csr.save();
@@ -260,8 +314,17 @@ export const submitCSR = async (req, res) => {
     res.status(200).json({ message: 'CSR submitted successfully!', pdfPath });
 
     } catch (error) {
-        console.error('Error submitting CSR:', error);
-        res.status(500).json({ error: 'Error submitting CSR', details: error.message });
+        console.error('[submitCSR] Error:', {
+            employeeId: req.user._id,
+            spvNumber: req.body.spvNumber,
+            workWeek: req.body.WorkWeekNumber,
+            error: error.message,
+            stack: error.stack
+        });
+        res.status(500).json({ 
+            error: 'Error submitting CSR', 
+            details: error.message 
+        });
     }
 };
 

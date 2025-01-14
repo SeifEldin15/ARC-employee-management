@@ -1,4 +1,5 @@
 import Company from '../models/Company.js';
+import CSR from '../models/csr.js'
 
 export const createCompany = async (req, res) => {
         const { name, address, region, contacts = [], tools = [] } = req.body;
@@ -89,6 +90,29 @@ export const addTool = async (req, res) => {
     }
 };
 
+export const getPastVisitForCompany = async (req, res) => {
+    
+    const { companyId } = req.params;
+
+    try {
+        const csrData = await CSR.find({ companyId }).select(
+            'serviceEngineer weekEndDate totals.totalWeekHours purposeOfVisit'
+        );
+
+        const formattedData = csrData.map((item) => ({
+            serviceEngineer: item.serviceEngineer,
+            weekStartDate: item.weekEndDate.toISOString().split('T')[0], 
+            totalHours: item.totals.totalWeekHours,
+            purposeOfVisit: item.purposeOfVisit,
+        }));
+
+        res.status(200).json(formattedData);
+    } catch (err) {
+        console.error('Error fetching CSR data for company:', err);
+        res.status(500).json({ error: 'Failed to fetch CSR data for company' });
+    }
+};
+
 export const getCompanies = async (req, res) => {
     try {
         const companies = await Company.find().select(' name address contacts ');
@@ -101,16 +125,17 @@ export const getCompanies = async (req, res) => {
 export const getCompanyDetails = async (req, res) => {
     const { companyId } = req.params;
     try {
-        const company = await Company.findById(companyId).select('name address tools');
+        const company = await Company.findById(companyId).select('name address region  contacts tools');
         if (!company) {
             return res.status(404).json({ message: 'Company not found' });
         }
         res.status(200).json({
             company: company.name,
+            address: company.address ,
+            region : company.region ,
             details: {
-                address: company.address,
-                tools_installed: company.tools,
-                contacts: company.contacts
+                contacts: company.contacts,
+                tools_installed: company.tools
             }
         });
     } catch (error) {

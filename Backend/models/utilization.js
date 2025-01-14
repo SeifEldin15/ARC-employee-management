@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 
 const utilizationSchema = new mongoose.Schema({
     employeeId: String,
-    WorkWeekNumber: Number,
+    WeekNumber: Number ,
     year: Number,
-    SVR_Category :[
+    SVR_Category : [
         {
-            SVR: Number,
+            SVR: String ,
             day: String
         }
     ],

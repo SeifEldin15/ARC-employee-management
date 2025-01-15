@@ -38,6 +38,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         debug: true
         script: |
+          echo " ${{ secrets.SERVER_IP }}"
           echo "SSH connection test successful"
           pwd
           whoami

@@ -5,12 +5,20 @@ import Link from 'next/link';
 
 const ManagerContacts = () => {
   const [contracts, setContracts] = useState([]);
+  const [token, setToken] = useState(null);
 
+  // First useEffect to get token after component mounts
   useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
+  }, []);
+
+  // Second useEffect to fetch data once we have the token
+  useEffect(() => {
+    if (!token) return; // Don't fetch if we don't have a token
+
     const fetchContracts = async () => {
       try {
-        const token = localStorage.getItem('token');
-        
         const response = await fetch('https://slsvacation.com/api/manager/contracts', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -45,12 +53,12 @@ const ManagerContacts = () => {
         setContracts(transformedData);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setContracts([]); // Set empty array on error
+        setContracts([]);
       }
     };
 
     fetchContracts();
-  }, []);
+  }, [token]); // Only run when token changes
 
   const getProgressColor = (percentage) => {
     if (percentage >= 70) return 'bg-emerald-500'

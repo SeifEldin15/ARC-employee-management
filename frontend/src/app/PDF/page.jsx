@@ -104,7 +104,6 @@ export default function CustomerServiceReport() {
     setLoading(true)
     setError('')
 
-    // Format the weeklyTaskReport data to ensure numeric values
     const formattedWeeklyReport = formData.weeklyTaskReport.map(day => ({
       ...day,
       travelHours: parseFloat(day.travelHours) || 0,
@@ -124,7 +123,12 @@ export default function CustomerServiceReport() {
     };
 
     try {
-      const token = localStorage.getItem('token')
+      let token = '';
+      // Only access localStorage on the client side
+      if (typeof window !== 'undefined') {
+        token = localStorage.getItem('token');
+      }
+      
       const response = await axios.post(
         'https://slsvacation.com/api/employee/csr', 
         submitData,
@@ -132,7 +136,7 @@ export default function CustomerServiceReport() {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            ...(token && { 'Authorization': `Bearer ${token}` })
           }
         }
       )

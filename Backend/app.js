@@ -24,15 +24,30 @@ connectDB();
 
 // Set up CORS before other middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://arc-employee-management-fl3e.vercel.app');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  // Allow requests from your frontend domain
+  const allowedOrigins = [
+    'https://arc-employee-management-fl3e.vercel.app',
+    'http://localhost:3000',
+    'https://slsvacation.com'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  // Essential CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
+  res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie');
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+    return res.status(204).end();
   }
+  
   next();
 });
 

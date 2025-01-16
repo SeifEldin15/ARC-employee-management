@@ -1,0 +1,1 @@
+export default allowedOrigins = ["https://arc-employee-management-fl3e.vercel.app"]

@@ -16,31 +16,14 @@ import reminderRoutes from './routes/reminderRoutes.js';
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import corsOptions from './config/corsOptions.js'
 
 
 const app = express();
 
 connectDB();
 
-// Set up CORS before other middleware
-app.use((req, res, next) => {
-  // Allow requests from any origin
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
-
-  // Essential CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', '*');  // Allow all methods
-  res.setHeader('Access-Control-Allow-Headers', '*');  // Allow all headers
-  res.setHeader('Access-Control-Expose-Headers', '*'); // Expose all headers
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
-    return res.status(204).end();
-  }
-  
-  next();
-});
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());

@@ -77,9 +77,9 @@ jobs:
 
              
           # Frontend deployment
-          if [ -d "Frontend" ]; then
+          if [ -d "frontend" ]; then
             echo "Building Frontend..."
-            cd Frontend
+            cd frontend
             rm -rf node_modules
             rm package-lock.json
             npm install
@@ -95,7 +95,7 @@ jobs:
             # Start/restart frontend server with PM2
             if pm2 list | grep -q "frontend"; then
               echo "Restarting frontend service..."
-              pm2 restart planster-frontend
+              pm2 restart frontend
             else
               echo "Starting frontend service..."
               pm2 start npx --name "frontend" -- serve -s dist -l 3000
@@ -103,7 +103,7 @@ jobs:
             
             cd ..
           else
-            echo "Frontend directory not found!"
+            echo "frontend directory not found!"
             exit 1
           fi
           

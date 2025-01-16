@@ -24,7 +24,7 @@ const ContactsDashboard = () => {
           return;
         }
 
-        const response = await fetch('http://localhost:5000/api/company', {
+        const response = await fetch('https://slsvacation.com/api/company', {
           method: 'GET',
           credentials: 'include',
           headers: {

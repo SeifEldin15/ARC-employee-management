@@ -22,27 +22,22 @@ const app = express();
 
 connectDB();
 
+// Set up CORS before other middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://arc-employee-management-fl3e.vercel.app');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors({
-  origin: ['https://arc-employee-management.vercel.app', 'http://localhost:3000', 'https://arc-employee-management-fl3e.vercel.app', 'https://slsvacation.com'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type', 
-    'Accept', 
-    'Authorization',
-    'Origin',
-    'X-Requested-With',
-    'Access-Control-Allow-Origin',
-    'Access-Control-Allow-Credentials'
-  ],
-  exposedHeaders: ['Access-Control-Allow-Origin'],
-  preflightContinue: true,
-  optionsSuccessStatus: 204
-}));
-
-app.options('*', cors());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/employee', employeeRoutes);

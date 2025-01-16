@@ -22,25 +22,20 @@ const app = express();
 
 connectDB();
 
-// Set up CORS before other middleware
-app.use((req, res, next) => {
-  // Allow requests from any origin
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
-
-  // Essential CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', '*');  // Allow all methods
-  res.setHeader('Access-Control-Allow-Headers', '*');  // Allow all headers
-  res.setHeader('Access-Control-Expose-Headers', '*'); // Expose all headers
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
-    return res.status(204).end();
-  }
-  
-  next();
-});
+// Update CORS configuration to specifically allow your Vercel frontend
+app.use(cors({
+  origin: [
+    'https://arc-employee-management-fl3e.vercel.app', 
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Set-Cookie'],
+  maxAge: 86400, // 24 hours
+  optionsSuccessStatus: 200 // Added from your second configuration
+}));
 
 app.use(cookieParser());
 app.use(express.json());

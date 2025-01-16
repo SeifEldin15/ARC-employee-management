@@ -20,21 +20,30 @@ const Sidebar = () => {
     { 
       title: 'Contacts', 
       icon: <MdPeople className="text-xl md:text-lg" />, 
-      href: role === 'Manager' ? '/managercontacts' : '/contacts' 
+      href: '/contacts'
     },
-    { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/report' },
-    { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/pdf' },
+    ...(role !== 'Manager' ? [
+      { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/report' },
+      { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/pdf' },
+    ] : []),
     { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/myreports' },
-    ...(role === 'Manager' ? [{
-      title: 'Team',
-      icon: <MdGroups className="text-xl md:text-lg" />,
-      href: '/team'
-    }] : [])
+    ...(role === 'Manager' ? [
+      {
+        title: 'Team',
+        icon: <MdGroups className="text-xl md:text-lg" />,
+        href: '/team'
+      },
+      {
+        title: 'Contracts',
+        icon: <MdDescription className="text-xl md:text-lg" />,
+        href: '/contracts'
+      }
+    ] : [])
   ];
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('https://slsvacation.com/api/auth/logout', {
+      const response = await fetch('http://localhost:5000/api/auth/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,19 +54,12 @@ const Sidebar = () => {
         throw new Error('Logout failed');
       }
 
-      // Get role before clearing localStorage
-      const role = localStorage.getItem('role');
-
       // Clear token and role from localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('role');
 
-      // Redirect based on role
-      if (role === 'Manager') {
-        window.location.href = '/managerdashboard';
-      } else {
-        window.location.href = '/dashboard';
-      }
+      // Redirect to root path
+      window.location.href = '/';
     } catch (err) {
       console.error(err.message);
     }

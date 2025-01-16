@@ -2,7 +2,7 @@ name: Deploy MERN Application
 
 on:
   push:
-    branches: [ backend ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -74,7 +74,7 @@ jobs:
             git reset --hard origin/main
           fi
           
-                                  
+                               
           # Backend deployment
           if [ -d "Backend" ]; then
             echo "Setting up Backend..."

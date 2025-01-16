@@ -16,26 +16,17 @@ import reminderRoutes from './routes/reminderRoutes.js';
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import corsOptions from './config/corsOptions.js'
 
 
 const app = express();
 
 connectDB();
 
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors({
-  origin: ['https://arc-employee-management.vercel.app', 'http://localhost:3000'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type', 
-    'Accept', 
-    'Authorization',
-    'Origin',
-    'X-Requested-With'
-  ]
-}));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/employee', employeeRoutes);

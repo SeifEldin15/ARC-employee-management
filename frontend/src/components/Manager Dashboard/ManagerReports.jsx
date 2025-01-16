@@ -34,7 +34,6 @@ const ManagerReports = () => {
         // Handle unauthorized access
         if (error.response?.status === 401) {
           // Redirect to login page
-          window.location.href = '/';
         }
       }
     };

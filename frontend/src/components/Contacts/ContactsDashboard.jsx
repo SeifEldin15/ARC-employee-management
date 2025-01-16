@@ -20,7 +20,6 @@ const ContactsDashboard = () => {
         
         if (!token) {
           console.log('No token found in localStorage');
-          window.location.href = '/';
           return;
         }
 

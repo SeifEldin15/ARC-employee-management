@@ -33,7 +33,7 @@ export default function DashboardPage() {
       try {
         const token = localStorage.getItem('token');
         const response = await fetch(`https://slsvacation.com/api/company/${id}`, {
-          credentials: 'include',
+          withCredentials: true,
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',

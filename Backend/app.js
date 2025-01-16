@@ -16,14 +16,27 @@ import reminderRoutes from './routes/reminderRoutes.js';
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import corsOptions from './config/corsOptions.js'
 
 
 const app = express();
 
 connectDB();
 
-app.use(cors(corsOptions));
+// Update CORS configuration to specifically allow your Vercel frontend
+app.use(cors({
+  origin: [
+    'https://arc-employee-management-fl3e.vercel.app', 
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Set-Cookie'],
+  maxAge: 86400, // 24 hours
+  optionsSuccessStatus: 200 // Added from your second configuration
+}));
+
 app.use(cookieParser());
 app.use(express.json());
 

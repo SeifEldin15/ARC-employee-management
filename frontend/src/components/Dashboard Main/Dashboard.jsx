@@ -31,12 +31,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        let token;
-        // Check if window is defined (client-side)
-        if (typeof window !== 'undefined') {
-          token = localStorage.getItem('token');
-        }
-        
+        const token = localStorage.getItem('token');
+        console.log('Token from localStorage:', token); // Debug log
         // Check if token exists
         if (!token) {
           // window.location.href = '/';
@@ -44,7 +40,7 @@ const Dashboard = () => {
         }
 
         const response = await axios.get('https://slsvacation.com/api/employee/reports', {
-          withCredentials: true,
+          credentials: 'include',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -56,10 +52,8 @@ const Dashboard = () => {
       } catch (err) {
         console.error('Fetch error:', err);
         if (err.response?.status === 401) {
-          // Only clear token on client side
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('token');
-          }
+          // Redirect to login if unauthorized
+          // localStorage.removeItem('token'); // Clear invalid token
           // window.location.href = '/';
         }
         setError(err.response?.data?.message || 'Failed to fetch reports');

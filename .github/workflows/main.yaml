@@ -74,34 +74,6 @@ jobs:
           fi
           cd ARC-employee-management
           pwd 
-
-             
-          # Frontend deployment
-          if [ -d "frontend" ]; then
-            echo "Building Frontend..."
-            cd frontend
-            rm -rf node_modules
-            rm package-lock.json
-            npm install
-            npm run build
-          
-            
-            # Start/restart frontend server with PM2
-            if pm2 list | grep -q "frontend"; then
-              echo "Restarting frontend service..."
-              pm2 restart frontend
-            else
-              echo "Starting frontend service..."
-              pm2 npm run start --name "frontend" 
-            fi
-            
-            cd ..
-          else
-            echo "frontend directory not found!"
-            exit 1
-          fi
-          
-          
           # Backend deployment
           if [ -d "Backend" ]; then
             echo "Setting up Backend..."

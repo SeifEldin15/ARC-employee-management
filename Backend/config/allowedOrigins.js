@@ -1,1 +1,4 @@
-export default allowedOrigins = ["https://arc-employee-management-fl3e.vercel.app"]
+export default allowedOrigins = [
+    "https://arc-employee-management-fl3e.vercel.app",
+    // ... other allowed origins ...
+];

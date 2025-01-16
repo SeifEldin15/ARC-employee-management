@@ -1,12 +1,16 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MdDashboard, MdPeople, MdTimeline, MdSupportAgent, MdDescription, MdLogout, MdMenu, MdGroups } from 'react-icons/md';
 
 const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const role = localStorage.getItem('role');
-  
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    setRole(localStorage.getItem('role'));
+  }, []);
+
   const menuItems = [
     { 
       title: 'Dashboard', 

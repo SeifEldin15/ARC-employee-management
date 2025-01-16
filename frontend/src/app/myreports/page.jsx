@@ -1,16 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Sidebar from '@/components/Sidebar'
-import axios from 'axios'
+import dynamic from 'next/dynamic'
 
-export default function MyReports() {
+// Create a dynamic component with SSR disabled
+const MyReportsComponent = dynamic(() => Promise.resolve(function MyReports() {
   const [reports, setReports] = useState([])
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         const response = await axios.get('https://slsvacation.com/api/employee/reports', {
           withCredentials: true,
           headers: {
@@ -77,4 +76,8 @@ export default function MyReports() {
       </div>
     </>
   )
+}), { ssr: false })
+
+export default function MyReports() {
+  return <MyReportsComponent />
 }

@@ -24,23 +24,14 @@ connectDB();
 
 // Set up CORS before other middleware
 app.use((req, res, next) => {
-  // Allow requests from your frontend domain
-  const allowedOrigins = [
-    'https://arc-employee-management-fl3e.vercel.app',
-    'http://localhost:3000',
-    'https://slsvacation.com'
-  ];
-  
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+  // Allow requests from any origin
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
 
   // Essential CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
-  res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie');
+  res.setHeader('Access-Control-Allow-Methods', '*');  // Allow all methods
+  res.setHeader('Access-Control-Allow-Headers', '*');  // Allow all headers
+  res.setHeader('Access-Control-Expose-Headers', '*'); // Expose all headers
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {

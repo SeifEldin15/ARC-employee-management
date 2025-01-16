@@ -38,7 +38,6 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         debug: true
         script: |
-          echo " ${{ secrets.SERVER_IP }} "
           echo "SSH connection test successful"
           pwd
           whoami
@@ -64,7 +63,7 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-          
+          pwd 
           # Clone repository using HTTPS with token authentication
           echo "Cloning repository..."
           if [ ! -d ".git" ]; then
@@ -73,8 +72,9 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
           fi
+          cd ARC-employee-management
+          pwd 
           
-                               
           # Backend deployment
           if [ -d "Backend" ]; then
             echo "Setting up Backend..."

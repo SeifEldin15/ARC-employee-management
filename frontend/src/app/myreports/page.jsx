@@ -11,7 +11,7 @@ export default function MyReports() {
     const fetchReports = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/employee/reports', {
+        const response = await axios.get('https://slsvacation.com/api/employee/reports', {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ export default function MyReports() {
       } catch (error) {
         console.error('Error fetching reports:', error)
         if (error.response?.status === 401) {
-          window.location.href = '/';
+          console.log('Unauthorized access - redirecting to login');
         }
       }
     }

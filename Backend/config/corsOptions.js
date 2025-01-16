@@ -1,11 +1,11 @@
 import allowedOrigins from './allowedOrigins.js'
 
 const corsOptions = {
-    origin: (origin, Callback) => {
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            Callback(null, true);
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
         } else {
-            Callback(new Error("Not allowed by CORS"));
+            callback(new Error("Not allowed by CORS"));
         }
     },
     credentials: true,

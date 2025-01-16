@@ -8,7 +8,7 @@ const ManagerReports = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get('https://slsvacation.com/api/manager/dashboard', {
+        const response = await axios.get('http://localhost:5000/api/manager/dashboard', {
           withCredentials: true,
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -47,7 +47,7 @@ const ManagerReports = () => {
       // Extract just the week number from the date string without adding "WW"
       const weekNumber = weekInfo.date.split(' ')[0]; // This will give us just the number
 
-      await axios.post('https://slsvacation.com/api/reminder/send-reminder', {
+      await axios.post('http://localhost:5000/api/reminder/send-reminder', {
         email: employee.email,
         missingWeekS: weekNumber  // Send just the number, let backend add "WW"
       }, {

@@ -48,7 +48,7 @@ const Report = () => {
       // Get token only when needed and check if we're in browser environment
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       
-      const response = await fetch('https://slsvacation.com/api/employee/utilization', {
+      const response = await fetch('http://localhost:5000/api/employee/utilization', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

@@ -1,16 +1,17 @@
 'use client'
 
-import dynamic from 'next/dynamic'
+import { useState, useEffect } from 'react'
+import Sidebar from '@/components/Sidebar'
+import axios from 'axios'
 
-// Create a dynamic component with SSR disabled
-const MyReportsComponent = dynamic(() => Promise.resolve(function MyReports() {
+export default function MyReports() {
   const [reports, setReports] = useState([])
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-        const response = await axios.get('https://slsvacation.com/api/employee/reports', {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/employee/reports', {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
@@ -31,7 +32,7 @@ const MyReportsComponent = dynamic(() => Promise.resolve(function MyReports() {
       } catch (error) {
         console.error('Error fetching reports:', error)
         if (error.response?.status === 401) {
-          window.location.href = '/';
+          console.log('Unauthorized access - redirecting to login');
         }
       }
     }
@@ -76,8 +77,4 @@ const MyReportsComponent = dynamic(() => Promise.resolve(function MyReports() {
       </div>
     </>
   )
-}), { ssr: false })
-
-export default function MyReports() {
-  return <MyReportsComponent />
 }

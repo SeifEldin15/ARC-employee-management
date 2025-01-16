@@ -19,7 +19,7 @@ const ManagerContacts = () => {
 
     const fetchContracts = async () => {
       try {
-        const response = await fetch('https://slsvacation.com/api/manager/contracts', {
+        const response = await fetch('http://localhost:5000/api/manager/contracts', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ const ManagerContacts = () => {
                 <div key={index} className="grid grid-cols-12 p-4 border-b last:border-b-0 items-center">
                   <div className="col-span-3">
                     <Link 
-                      href={`/contact/${contract.id}`}
+                      href={`/contract/${contract.id}`}
                       className="text-blue-600 hover:text-blue-800 cursor-pointer"
                     >
                       {contract.company}

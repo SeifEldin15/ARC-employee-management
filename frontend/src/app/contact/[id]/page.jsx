@@ -32,21 +32,34 @@ export default function DashboardPage() {
     const fetchCompanyData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`https://slsvacation.com/api/company/${id}`, {
-          withCredentials: true,
+        if (!token) {
+          console.log('No token found in localStorage');
+          return;
+        }
+
+        const response = await fetch(`http://localhost:5000/api/company/${id}`, {
+          method: 'GET',
+          credentials: 'include',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           }
         });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.log('Unauthorized access - redirecting to login');
+            window.location.href = '/';
+            return;
+          }
+          throw new Error('Failed to fetch company data');
+        }
+
         const data = await response.json();
         setCompanyData(data);
       } catch (error) {
         console.error('Error fetching company data:', error);
-        if (error.response?.status === 401) {
-          window.location.href = '/';
-        }
       }
     };
 

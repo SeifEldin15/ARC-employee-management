@@ -4,8 +4,10 @@ import { BsTelephoneFill } from 'react-icons/bs';
 import { MdEmail } from 'react-icons/md';
 import Sidebar from '@/components/Sidebar';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function TeamPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [teamMembers, setTeamMembers] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,7 +27,7 @@ export default function TeamPage() {
         const token = localStorage.getItem('token');
         console.log('Fetching team members with token:', token ? 'Token exists' : 'No token');
         
-        const response = await axios.get('https://slsvacation.com/api/manager/team', {
+        const response = await axios.get('http://localhost:5000/api/manager/team', {
           withCredentials: true,
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -48,6 +50,7 @@ export default function TeamPage() {
             title: member.job_title,
             phone: member.phone,
             email: member.email,
+            id: member._id
           });
           return acc;
         }, {});
@@ -89,7 +92,7 @@ export default function TeamPage() {
         password: formData.password ? '[REDACTED]' : 'missing'
       });
 
-      const response = await axios.post('https://slsvacation.com/api/manager/team', 
+      const response = await axios.post('http://localhost:5000/api/manager/team', 
         formData,
         {
           withCredentials: true,
@@ -105,7 +108,7 @@ export default function TeamPage() {
 
       if (response.status === 200 || response.status === 201) {
         // Refresh team members list
-        const updatedResponse = await axios.get('https://slsvacation.com/api/manager/team', {
+        const updatedResponse = await axios.get('http://localhost:5000/api/manager/team', {
           withCredentials: true,
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -125,6 +128,7 @@ export default function TeamPage() {
             title: member.job_title,
             phone: member.phone,
             email: member.email,
+            id: member._id
           });
           return acc;
         }, {});
@@ -149,6 +153,10 @@ export default function TeamPage() {
       });
       setError(error.response?.data?.message || 'Error adding team member');
     }
+  };
+
+  const handleEmployeeClick = (id) => {
+    router.push(`/employee/${id}`);
   };
 
   return (
@@ -187,7 +195,11 @@ export default function TeamPage() {
                 <h2 className="text-gray-600 text-sm font-medium mb-4">{region}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {members.map((member) => (
-                    <div key={member.email} className="bg-white p-4 rounded-lg shadow-sm border">
+                    <div 
+                      key={member.email} 
+                      className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => handleEmployeeClick(member.id)}
+                    >
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
                           {member.initials}

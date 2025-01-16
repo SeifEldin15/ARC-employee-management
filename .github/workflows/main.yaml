@@ -84,13 +84,7 @@ jobs:
             rm package-lock.json
             npm install
             npm run build
-            
-            # Serve the frontend build
-            echo "Serving Frontend..."
-            if ! command -v serve &> /dev/null; then
-              echo "Installing serve..."
-              npm install -g serve
-            fi
+          
             
             # Start/restart frontend server with PM2
             if pm2 list | grep -q "frontend"; then
@@ -98,7 +92,7 @@ jobs:
               pm2 restart frontend
             else
               echo "Starting frontend service..."
-              pm2 start npx --name "frontend" -- serve -s dist -l 3000
+              pm2 npm run start --name "frontend" 
             fi
             
             cd ..

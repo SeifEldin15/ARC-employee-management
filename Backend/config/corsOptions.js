@@ -1,0 +1,17 @@
+const allowedOrigins = [
+    "https://arc-employee-management-fl3e.vercel.app",
+    "http://localhost:3000"
+];
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.error(`Blocked by CORS: ${origin}`);
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200, // For legacy browsers
+};

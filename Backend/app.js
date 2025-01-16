@@ -33,9 +33,16 @@ app.use(cors({
     'Accept', 
     'Authorization',
     'Origin',
-    'X-Requested-With'
-  ]
+    'X-Requested-With',
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Credentials'
+  ],
+  exposedHeaders: ['Access-Control-Allow-Origin'],
+  preflightContinue: true,
+  optionsSuccessStatus: 204
 }));
+
+app.options('*', cors());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/employee', employeeRoutes);

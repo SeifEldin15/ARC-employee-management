@@ -45,7 +45,7 @@ const Report = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/employee/utilization', {
+      const response = await fetch('https://slsvacation.com/api/employee/utilization', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

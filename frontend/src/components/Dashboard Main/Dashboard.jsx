@@ -39,7 +39,7 @@ const Dashboard = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:5000/api/employee/reports', {
+        const response = await axios.get('https://slsvacation.com/api/employee/reports', {
           withCredentials: true,
           headers: {
             'Accept': 'application/json',

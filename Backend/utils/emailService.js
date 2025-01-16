@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { EMAIL_USER, EMAIL_PASSWORD, EMAIL_SERVICE } from '../config/env.js';
 
-export const sendReminderEmail = async (employeeEmail, missingWeeks) => {
+export const sendReminderEmail = async (employeeEmail, missingWeekS) => {
     const transporter = nodemailer.createTransport({
         service: EMAIL_SERVICE ,
         auth: {
@@ -14,7 +14,7 @@ export const sendReminderEmail = async (employeeEmail, missingWeeks) => {
         from: EMAIL_USER,
         to: employeeEmail,
         subject: 'Missing Utilization Reports Reminder',
-        text: `You have missing utilization reports for the following weeks: WW${missingWeeks}. Please submit them as soon as possible.`
+        text: `You have missing utilization reports for the following weeks: ${missingWeekS}. Please submit them as soon as possible.`
     };
 
     try {

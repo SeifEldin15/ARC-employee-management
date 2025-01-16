@@ -1,10 +1,21 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import ManagerReports from '@/components/Manager Dashboard/ManagerReports';
 import Distribution from '@/components/Dashboard Main/Distribution';
 import VerticalDistribution from '@/components/Dashboard Main/VericalDistribution';
 
 export default function DashboardPage() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // or a loading spinner
+  }
+
   return (
     <div className="min-h-screen">
       <Sidebar />

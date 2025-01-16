@@ -5,13 +5,21 @@ import Link from 'next/link';
 
 const ManagerContacts = () => {
   const [contracts, setContracts] = useState([]);
+  const [token, setToken] = useState(null);
 
+  // First useEffect to get token after component mounts
   useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
+  }, []);
+
+  // Second useEffect to fetch data once we have the token
+  useEffect(() => {
+    if (!token) return; // Don't fetch if we don't have a token
+
     const fetchContracts = async () => {
       try {
-        const token = localStorage.getItem('token');
-        
-        const response = await fetch('http://localhost:5000/api/manager/contracts', {
+        const response = await fetch('https://slsvacation.com/api/manager/contracts', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -33,26 +41,28 @@ const ManagerContacts = () => {
         const data = await response.json();
         const contractsArray = Array.isArray(data) ? data : (data.contracts || []);
         
+        console.log('Raw API data:', contractsArray);
+        
         const transformedData = contractsArray.map(contract => ({
-          id: contract._id || contract.id,
-          company: contract.customer,
-          type: contract.serviceType,
-          hours: contract.contractHours,
-          total: 100
+          id: contract._id,
+          company: contract.company,
+          type: contract.contractType,
+          hours: contract.usedHours,
+          total: contract.contractHours
         }));
         setContracts(transformedData);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setContracts([]); // Set empty array on error
+        setContracts([]);
       }
     };
 
     fetchContracts();
-  }, []);
+  }, [token]); // Only run when token changes
 
-  const getProgressColor = (hours) => {
-    if (hours >= 70) return 'bg-emerald-500'
-    if (hours >= 30) return 'bg-orange-400'
+  const getProgressColor = (percentage) => {
+    if (percentage >= 70) return 'bg-emerald-500'
+    if (percentage >= 30) return 'bg-orange-400'
     return 'bg-red-500'
   }
 
@@ -91,8 +101,8 @@ const ManagerContacts = () => {
                   <div className="flex items-center gap-2 w-full col-span-6">
                     <div className="relative flex-1 bg-gray-200 rounded-full h-2.5 overflow-hidden">
                       <div
-                        className={`absolute top-0 left-0 ${getProgressColor(contract.hours)} h-full rounded-full transition-all duration-300`}
-                        style={{ width: `${Math.min(contract.hours, 100)}%` }}
+                        className={`absolute top-0 left-0 ${getProgressColor((contract.hours / contract.total) * 100)} h-full rounded-full transition-all duration-300`}
+                        style={{ width: `${Math.min((contract.hours / contract.total) * 100, 100)}%` }}
                       />
                     </div>
                     <span className="text-sm text-gray-600 whitespace-nowrap min-w-[90px]">

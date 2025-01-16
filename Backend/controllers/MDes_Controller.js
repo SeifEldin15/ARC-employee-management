@@ -18,7 +18,9 @@ export const getManagerDashboard = async (req, res) => {
                 })
                 .map(week => ({
                     weekNumber: `WW${week.weekNumber}`,
-                    dateRange: `${week.startDate.toISOString().split('T')[0]} - ${week.endDate.toISOString().split('T')[0]}`
+                    dateRange: week.startDate && week.endDate 
+                        ? `${week.startDate.toISOString().split('T')[0]} - ${week.endDate.toISOString().split('T')[0]}`
+                        : 'Date range not available'
                 }));
 
             return {

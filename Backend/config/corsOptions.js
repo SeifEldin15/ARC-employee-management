@@ -1,15 +1,17 @@
-import allowedOrigins from './allowedOrigins.js'
+const allowedOrigins = [
+    "https://arc-employee-management-fl3e.vercel.app",
+    "http://localhost:3000"
+];
 
 const corsOptions = {
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            console.error(`Blocked by CORS: ${origin}`);
             callback(new Error("Not allowed by CORS"));
         }
     },
     credentials: true,
-    optionsSuccessStatus: 200,
-}
-
-export default corsOptions; 
+    optionsSuccessStatus: 200, // For legacy browsers
+};

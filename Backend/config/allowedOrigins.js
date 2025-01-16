@@ -1,7 +1,3 @@
-const allowedOrigins = [
-    "https://arc-employee-management-fl3e.vercel.app", 
-    "http://localhost:3000" ,
-    // ... other allowed origins ...
-];
+const ALLOWED_ORIGINS="https://arc-employee-management-fl3e.vercel.app,http://localhost:3000" 
 
-export default allowedOrigins; 
+export default ALLOWED_ORIGINS ;

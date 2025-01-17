@@ -85,4 +85,7 @@ csrSchema.pre('save', function (next) {
     next();
 });
 
-export default mongoose.model('CSR', csrSchema);
+// Use mongoose.models.CSR to check if model exists before creating
+const CSR = mongoose.models.CSR || mongoose.model('CSR', csrSchema);
+
+export default CSR;

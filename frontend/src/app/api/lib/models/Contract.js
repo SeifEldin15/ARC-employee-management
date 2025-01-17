@@ -1,7 +1,7 @@
 import mongoose from 'mongoose' ;
 
-const contractSchema = new mongoose.Schema({
-
+// Check if the model is already defined to prevent recompilation
+const Contract = mongoose.models.Contract || mongoose.model('Contract', new mongoose.Schema({
     customer: { type: String ,required: true } , 
     contactName: { type: String ,required: true } , 
     email: { type: String ,required: true } , 
@@ -16,6 +16,6 @@ const contractSchema = new mongoose.Schema({
         enum: ['Service', 'PC'], 
         required: true
     }
-});
+}));
 
-export default mongoose.model('Contract', contractSchema);
+export default Contract;

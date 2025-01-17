@@ -17,6 +17,8 @@ const nextConfig = {
       ],
     };
   },
+  // Add trailing slash configuration to ensure consistent handling
+  trailingSlash: false,
 };
 
 export default nextConfig;

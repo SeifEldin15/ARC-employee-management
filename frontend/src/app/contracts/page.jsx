@@ -19,13 +19,13 @@ const ManagerContacts = () => {
 
     const fetchContracts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/manager/contracts', {
+        const response = await fetch(`/api/contract`, {
+          method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          credentials: 'include'
+            'Authorization': `Bearer ${token}`
+          }
         });
         
         if (!response.ok) {
@@ -85,7 +85,7 @@ const ManagerContacts = () => {
                 <div key={index} className="grid grid-cols-12 p-4 border-b last:border-b-0 items-center">
                   <div className="col-span-3">
                     <Link 
-                      href={`/contract/${contract.id}`}
+                      href={`/Contract/${contract.id}`}
                       className="text-blue-600 hover:text-blue-800 cursor-pointer"
                     >
                       {contract.company}

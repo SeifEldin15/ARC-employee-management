@@ -17,4 +17,6 @@ const workweekSchema = new mongoose.Schema({
  
 });
 
-export default mongoose.model('Workweek', workweekSchema);
+// Prevent model recompilation in development
+const Workweek = mongoose.models.Workweek || mongoose.model('Workweek', workweekSchema);
+export default Workweek;

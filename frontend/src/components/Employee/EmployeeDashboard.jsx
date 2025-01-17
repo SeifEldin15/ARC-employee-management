@@ -17,7 +17,7 @@ const EmployeeDashboard = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:5000/api/manager/team/${employeeId}`,
+          `/api/team/details/${employeeId}`,
           {
             headers: {
               'Accept': 'application/json',

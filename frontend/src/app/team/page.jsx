@@ -27,7 +27,7 @@ export default function TeamPage() {
         const token = localStorage.getItem('token');
         console.log('Fetching team members with token:', token ? 'Token exists' : 'No token');
         
-        const response = await axios.get('http://localhost:5000/api/manager/team', {
+        const response = await axios.get('/api/team/members', {
           withCredentials: true,
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -92,7 +92,7 @@ export default function TeamPage() {
         password: formData.password ? '[REDACTED]' : 'missing'
       });
 
-      const response = await axios.post('http://localhost:5000/api/manager/team', 
+      const response = await axios.post('/api/team/add', 
         formData,
         {
           withCredentials: true,
@@ -108,7 +108,7 @@ export default function TeamPage() {
 
       if (response.status === 200 || response.status === 201) {
         // Refresh team members list
-        const updatedResponse = await axios.get('http://localhost:5000/api/manager/team', {
+        const updatedResponse = await axios.get('/api/team/members', {
           withCredentials: true,
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -156,7 +156,7 @@ export default function TeamPage() {
   };
 
   const handleEmployeeClick = (id) => {
-    router.push(`/employee/${id}`);
+    router.push(`/Employee/${id}`);
   };
 
   return (

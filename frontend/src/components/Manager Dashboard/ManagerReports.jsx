@@ -65,58 +65,73 @@ const ManagerReports = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-center mb-2">Missing Utilization Reports</h1>
-      <p className="text-gray-600 mb-6 text-center">Showing reports for the last 4 work weeks</p>
-      
-      <div className="overflow-x-auto shadow-lg rounded-lg">
-        <table className="min-w-full bg-white border">
-          <thead>
-            <tr className="">
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Employee Name</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Missing Reports</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {employees.map((employee, index) => (
-              <tr key={index} className={employee.status === '1 Missing' ? 'bg-red-50' : 'bg-white'}>
-                <td className="px-6 py-4 text-sm text-gray-900">{employee.name}</td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                    {employee.reports.map((report, reportIndex) => (
-                      <div key={reportIndex} className="flex items-center gap-2 border border-red-300 rounded p-0.5">
-                        <span className="bg-pink-50 text-red-600 text-xs px-2 py-0.5 rounded whitespace-nowrap">
-                          {report.date}
-                        </span>
-                        <button 
-                          onClick={() => handleReminder(employee, report)}
-                          className="flex items-center gap-1 text-white text-xs bg-blue-500 hover:bg-blue-600 px-2 py-0.5 rounded"
-                        >
-                          <BsFillBellFill className="text-white text-xs" />
-                          Remind
-                        </button>
-                      </div>
-                    ))}
-                    {employee.status === 'Up to Date' && (
-                      <span className="text-sm text-gray-500">None</span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  {employee.status === '1 Missing' ? (
-                    <span className="inline-flex px-2 py-0.5 text-sm border border-red-300 text-red-600 bg-red-50 rounded">
-                      {employee.status}
-                    </span>
-                  ) : (
-                    <span className="inline-flex px-2 py-0.5 text-sm border border-green-300 text-green-600 bg-green-50 rounded">
-                      {employee.status}
-                    </span>
-                  )}
-                </td>
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Missing Utilization Reports</h1>
+        <p className="text-gray-600 mb-8">Showing reports for the last 4 work weeks</p>
+        
+        <div className="overflow-hidden shadow-lg rounded-lg border border-gray-200">
+          <table className="min-w-full bg-white">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 tracking-wider">Employee Name</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 tracking-wider">Missing Reports</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 tracking-wider">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {employees.map((employee, index) => (
+                <tr key={index} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-gray-600 font-medium text-sm">
+                          {employee.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                        <div className="text-sm text-gray-500">{employee.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      {employee.reports.map((report, reportIndex) => (
+                        <div key={reportIndex} 
+                             className="flex w-[48%] items-center justify-between gap-2 border border-red-200 rounded-lg bg-red-50/50 p-2 hover:bg-red-50 transition-colors">
+                          <span className="text-red-600 text-xs font-medium">
+                            Week {report.date}
+                          </span>
+                          <button 
+                            onClick={() => handleReminder(employee, report)}
+                            className="flex items-center gap-1.5 text-white text-xs font-medium bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded"
+                          >
+                            <BsFillBellFill className="text-xs" />
+                            Remind
+                          </button>
+                        </div>
+                      ))}
+                      {employee.status === 'Up to Date' && (
+                        <span className="text-sm text-gray-500 italic">All reports submitted</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    {employee.status === 'Up to Date' ? (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {employee.status}
+                      </span>
+                    ) : (
+                      <span className="inline-flex px-4 py-1 text-sm border border-red-300 text-red-600 bg-red-50 rounded min-w-[100px] justify-center">
+                        {employee.status}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

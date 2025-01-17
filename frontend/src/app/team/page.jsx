@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BsTelephoneFill } from 'react-icons/bs';
 import { MdEmail } from 'react-icons/md';
+import { IoCloseCircle } from 'react-icons/io5';
 import Sidebar from '@/components/Sidebar';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -159,6 +160,35 @@ export default function TeamPage() {
     router.push(`/Employee/${id}`);
   };
 
+  const handleDeleteMember = async (id, e) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this team member?')) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(`/api/team/delete/${id}`, {
+          withCredentials: true,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        const updatedMembers = { ...teamMembers };
+        Object.keys(updatedMembers).forEach(region => {
+          updatedMembers[region] = updatedMembers[region].filter(member => member.id !== id);
+          if (updatedMembers[region].length === 0) {
+            delete updatedMembers[region];
+          }
+        });
+        setTeamMembers(updatedMembers);
+      } catch (error) {
+        console.error('Error deleting team member:', error);
+        setError(error.response?.data?.message || 'Error deleting team member');
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <Sidebar />
@@ -197,9 +227,15 @@ export default function TeamPage() {
                   {members.map((member) => (
                     <div 
                       key={member.email} 
-                      className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer hover:shadow-md transition-shadow"
+                      className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer hover:shadow-md transition-shadow relative"
                       onClick={() => handleEmployeeClick(member.id)}
                     >
+                      <div className="absolute top-2 right-2">
+                        <IoCloseCircle
+                          className="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer"
+                          onClick={(e) => handleDeleteMember(member.id, e)}
+                        />
+                      </div>
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
                           {member.initials}

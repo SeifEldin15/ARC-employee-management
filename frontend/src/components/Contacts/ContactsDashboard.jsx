@@ -23,7 +23,7 @@ const ContactsDashboard = () => {
           return;
         }
 
-        const response = await fetch('http://localhost:5000/api/company', {
+        const response = await fetch('/api/company', {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -152,7 +152,7 @@ const ContactsDashboard = () => {
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <Link 
-                      href={`/contact/${contact.companyId}`}
+                      href={`/Contact/${contact.companyId}`}
                       className="text-blue-600 hover:underline"
                     >
                       {contact.company}

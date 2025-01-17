@@ -25,3 +25,19 @@ export function generateToken(user) {
     { expiresIn: '3h' }
   );
 }
+
+export async function getToken() {
+  try {
+    const cookieStore = cookies();
+    const token = await cookieStore.get('token');
+
+    if (!token) {
+      return null;
+    }
+
+    return token.value;
+  } catch (error) {
+    console.error('Error getting token:', error);
+    return null;
+  }
+}

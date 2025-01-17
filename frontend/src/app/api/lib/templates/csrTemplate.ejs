@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Weekly Utilization Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Weekly Utilization Report</h1>
+  
+  <div>
+    <p>Week Starting: <%= workWeek %></p>
+    <p>SVR#: <%= SVR %></p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Activity</th>
+        <th>Hours</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% weeklyTaskReport.forEach(day => { %>
+        <% day.tasks.forEach(task => { %>
+          <tr>
+            <td><%= day.date %></td>
+            <td><%= task.activity %></td>
+            <td><%= task.hours %></td>
+          </tr>
+        <% }); %>
+      <% }); %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">Total Hours</td>
+        <td>
+          <%= weeklyTaskReport.reduce((total, day) => 
+            total + day.totalHours, 0
+          ).toFixed(1) %>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</body>
+</html>

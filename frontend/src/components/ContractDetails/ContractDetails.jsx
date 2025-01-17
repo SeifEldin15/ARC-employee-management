@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 
 const calculateDaysUntilExpiration = (endDate) => {
   const today = new Date();
@@ -16,16 +17,11 @@ const ContractDetails = () => {
   const [visits, setVisits] = useState([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
-  const id = window.location.pathname.split('/').pop()
+  const params = useParams()
+  const id = params.id
 
   useEffect(() => {
-    const fetchContractDetails = async () => {
-      console.log('Fetching contract details for ID:', id)
-      if (!id) {
-        console.log('No id provided')
-        return
-      }
-
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem('token')
         if (!token) {
@@ -34,39 +30,49 @@ const ContractDetails = () => {
           return
         }
 
-        console.log('Making API request...')
-        const response = await fetch(`/api/contract/${id}`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        })
+        // Fetch both contract and visits data
+        const [contractResponse, visitsResponse] = await Promise.all([
+          fetch(`/api/contract/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            }
+          }),
+          fetch(`/api/contract/visits/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json',
+            }
+          })
+        ])
 
-        console.log('Response status:', response.status)
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            console.log('Unauthorized access - redirecting to login')
+        if (!contractResponse.ok || !visitsResponse.ok) {
+          if (contractResponse.status === 401 || visitsResponse.status === 401) {
             window.location.href = '/'
             return
           }
-          throw new Error('Failed to fetch contract details')
+          throw new Error('Failed to fetch data')
         }
 
-        const data = await response.json()
-        console.log('Received data:', data)
-        setContract(data.contract)
+        const [contractData, visitsData] = await Promise.all([
+          contractResponse.json(),
+          visitsResponse.json()
+        ])
+
+        setContract({
+          ...contractData.contract,
+          usedHours: contractData.usedHours
+        })
+        setVisits(visitsData)
         setLoading(false)
       } catch (error) {
-        console.error('Error fetching contract details:', error)
+        console.error('Error fetching data:', error)
         setLoading(false)
       }
     }
 
-    fetchContractDetails()
+    fetchData()
   }, [id])
 
   const handleDeleteContract = async () => {
@@ -126,7 +132,7 @@ const ContractDetails = () => {
         </button>
       </div>
 
-      <h1 className="text-xl font-semibold text-gray-800 mb-4">{contract.company}</h1>
+      <h1 className="text-xl font-semibold text-gray-800 mb-4">{contract.customer}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Contract Details Card */}
@@ -193,17 +199,17 @@ const ContractDetails = () => {
         </div>
 
         <div className="divide-y divide-gray-100">
-          {contract.visits && contract.visits.map((visit, index) => (
+          {visits.map((visit, index) => (
             <div key={index} className="min-w-[768px] grid grid-cols-12 p-4 items-center">
               <div className="col-span-2 text-sm text-gray-900">
-                {new Date(visit.date).toLocaleDateString()}
+                {new Date(visit.weekStartDate).toLocaleDateString()}
               </div>
-              <div className="col-span-3 text-sm text-gray-900">{visit.engineer}</div>
-              <div className="col-span-2 text-sm text-gray-900">{visit.hoursUsed}</div>
-              <div className="col-span-5 text-sm text-gray-900">{visit.description}</div>
+              <div className="col-span-3 text-sm text-gray-900">{visit.serviceEngineer}</div>
+              <div className="col-span-2 text-sm text-gray-900">{visit.totalHours}</div>
+              <div className="col-span-5 text-sm text-gray-900">{visit.purposeOfVisit}</div>
             </div>
           ))}
-          {(!contract.visits || contract.visits.length === 0) && (
+          {visits.length === 0 && (
             <div className="p-4 text-sm text-gray-500 text-center">
               No visits recorded
             </div>

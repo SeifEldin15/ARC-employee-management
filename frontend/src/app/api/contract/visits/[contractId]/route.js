@@ -3,9 +3,11 @@ import connectDB from '@/app/api/lib/db';
 import CSR from '@/app/api/lib/models/csr';
 
 export async function GET(request, { params }) {
+  const { srvNumber } = params;
+  
   try {
     await connectDB();
-    const csrData = await CSR.find({ srvNumber: params.srvNumber })
+    const csrData = await CSR.find({ srvNumber })
       .select('serviceEngineer weekEndDate totals.totalWeekHours purposeOfVisit');
 
     const formattedData = csrData.map((item) => ({

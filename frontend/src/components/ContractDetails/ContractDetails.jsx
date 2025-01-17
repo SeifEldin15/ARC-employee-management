@@ -3,6 +3,14 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+const calculateDaysUntilExpiration = (endDate) => {
+  const today = new Date();
+  const expirationDate = new Date(endDate);
+  const diffTime = expirationDate - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+};
+
 const ContractDetails = () => {
   const [contract, setContract] = useState(null)
   const [visits, setVisits] = useState([])
@@ -106,7 +114,7 @@ const ContractDetails = () => {
   return (
     <div className="max-w-7xl mx-auto p-4">
       <div className="mb-3 flex justify-between items-center">
-        <Link href="/contracts" className="text-gray-500 hover:text-gray-700 text-sm">
+        <Link href="/Contracts" className="text-gray-500 hover:text-gray-700 text-sm">
           ← Back to Contracts
         </Link>
         <button
@@ -118,7 +126,7 @@ const ContractDetails = () => {
         </button>
       </div>
 
-      <h1 className="text-xl font-semibold text-gray-800 mb-4">TechCorp Solutions</h1>
+      <h1 className="text-xl font-semibold text-gray-800 mb-4">{contract.company}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Contract Details Card */}
@@ -140,7 +148,9 @@ const ContractDetails = () => {
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600">Status:</span>
               <div className="flex items-center gap-2">
-                <span className="text-orange-500">-340 days until expiration</span>
+                <span className="text-orange-500">
+                  {calculateDaysUntilExpiration(contract.endDate)} days until expiration
+                </span>
                 <button className="bg-orange-500 text-white px-2 py-0.5 rounded text-xs">
                   Send Reminder
                 </button>
@@ -183,27 +193,21 @@ const ContractDetails = () => {
         </div>
 
         <div className="divide-y divide-gray-100">
-          {/* Table rows */}
-          <div className="min-w-[768px] grid grid-cols-12 p-4 items-center">
-            <div className="col-span-2 text-sm text-gray-900">6/14/2023</div>
-            <div className="col-span-3 text-sm text-gray-900">Mike Johnson</div>
-            <div className="col-span-2 text-sm text-gray-900">8</div>
-            <div className="col-span-5 text-sm text-gray-900">Quarterly maintenance and calibration</div>
-          </div>
-
-          <div className="min-w-[768px] grid grid-cols-12 p-4 items-center">
-            <div className="col-span-2 text-sm text-gray-900">4/1/2023</div>
-            <div className="col-span-3 text-sm text-gray-900">Sarah Williams</div>
-            <div className="col-span-2 text-sm text-gray-900">12</div>
-            <div className="col-span-5 text-sm text-gray-900">Emergency repair and system upgrade</div>
-          </div>
-
-          <div className="min-w-[768px] grid grid-cols-12 p-4 items-center">
-            <div className="col-span-2 text-sm text-gray-900">2/19/2023</div>
-            <div className="col-span-3 text-sm text-gray-900">Mike Johnson</div>
-            <div className="col-span-2 text-sm text-gray-900">15</div>
-            <div className="col-span-5 text-sm text-gray-900">Initial setup and staff training</div>
-          </div>
+          {contract.visits && contract.visits.map((visit, index) => (
+            <div key={index} className="min-w-[768px] grid grid-cols-12 p-4 items-center">
+              <div className="col-span-2 text-sm text-gray-900">
+                {new Date(visit.date).toLocaleDateString()}
+              </div>
+              <div className="col-span-3 text-sm text-gray-900">{visit.engineer}</div>
+              <div className="col-span-2 text-sm text-gray-900">{visit.hoursUsed}</div>
+              <div className="col-span-5 text-sm text-gray-900">{visit.description}</div>
+            </div>
+          ))}
+          {(!contract.visits || contract.visits.length === 0) && (
+            <div className="p-4 text-sm text-gray-500 text-center">
+              No visits recorded
+            </div>
+          )}
         </div>
       </div>
     </div>

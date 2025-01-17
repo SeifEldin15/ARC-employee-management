@@ -130,7 +130,7 @@ export default function CustomerServiceReport() {
       }
       
       const response = await axios.post(
-        'http://localhost:5000/api/employee/csr', 
+        '/api/reports/csr', 
         submitData,
         {
           withCredentials: true,

@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -23,7 +25,7 @@ const ContractDetails = () => {
         }
 
         console.log('Making API request...')
-        const response = await fetch(`http://localhost:5000/api/manager/${id}/details`, {
+        const response = await fetch(`/api/contract/${id}`, {
           method: 'GET',
           credentials: 'include',
           headers: {

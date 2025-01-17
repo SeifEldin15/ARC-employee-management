@@ -26,7 +26,7 @@ const ContactSection = ({ contacts, companyId, onContactAdded }) => {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`/api/company/${companyId}/addContact`, {
+      const response = await fetch(`/api/company/${companyId}/contacts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

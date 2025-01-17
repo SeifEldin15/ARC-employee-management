@@ -11,7 +11,7 @@ export default function MyReports() {
     const fetchReports = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/employee/reports', {
+        const response = await axios.get('/api/reports/employee', {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',

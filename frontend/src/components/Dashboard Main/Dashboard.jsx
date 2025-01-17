@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 const Dashboard = () => {
   const [reports, setReports] = useState([]);
@@ -31,32 +30,19 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const token = localStorage.getItem('token');
-        
-        // Check if token exists
-        if (!token) {
-          // window.location.href = '/';
-          return;
+        const reportsResponse = await fetch('/api/reports/employee', {
+          credentials: 'include'
+        });
+
+        if (!reportsResponse.ok) {
+          throw new Error('Failed to fetch reports');
         }
 
-        const response = await axios.get('http://localhost:5000/api/employee/reports', {
-          withCredentials: true,
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        setReports(response.data);
+        const reportsData = await reportsResponse.json();
+        setReports(reportsData);
       } catch (err) {
         console.error('Fetch error:', err);
-        if (err.response?.status === 401) {
-          // Redirect to login if unauthorized
-          localStorage.removeItem('token'); // Clear invalid token
-          // window.location.href = '/';
-        }
-        setError(err.response?.data?.message || 'Failed to fetch reports');
+        setError(err.message || 'Failed to fetch reports');
       } finally {
         setLoading(false);
       }
@@ -64,6 +50,28 @@ const Dashboard = () => {
 
     fetchReports();
   }, []);
+
+  const handleDownload = async (pdfPath, reportType) => {
+    if (!pdfPath || pdfPath === 'Not submitted') return;
+    
+    try {
+      const response = await fetch(pdfPath);
+      if (!response.ok) throw new Error('Failed to download report');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${reportType}_report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Download error:', err);
+      setError('Failed to download report');
+    }
+  };
 
   if (loading) return <div className="w-full p-4">Loading...</div>;
   if (error) return <div className="w-full p-4 text-red-500">Error: {error}</div>;
@@ -96,6 +104,7 @@ const Dashboard = () => {
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-right">
                     <button 
+                      onClick={() => handleDownload(report.utilizationReport, 'utilization')}
                       className={`w-full sm:w-auto ${
                         report.utilizationReport === 'Not submitted' 
                           ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
@@ -108,6 +117,7 @@ const Dashboard = () => {
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-right">
                     <button 
+                      onClick={() => handleDownload(report.csrReport, 'csr')}
                       className={`w-full sm:w-auto ${
                         report.csrReport === 'Not submitted'
                           ? 'bg-gray-100 text-gray-500 cursor-not-allowed'

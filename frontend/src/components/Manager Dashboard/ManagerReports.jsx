@@ -8,7 +8,7 @@ const ManagerReports = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/manager/dashboard', {
+        const response = await axios.get('/api/dashboard/manager', {
           withCredentials: true,
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,

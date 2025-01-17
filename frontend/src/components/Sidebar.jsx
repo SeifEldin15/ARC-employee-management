@@ -41,28 +41,13 @@ const Sidebar = () => {
     ] : [])
   ];
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  const handleLogout = () => {
+    // Clear token and role from localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
 
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
-
-      // Clear token and role from localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-
-      // Redirect to root path
-      window.location.href = '/';
-    } catch (err) {
-      console.error(err.message);
-    }
+    // Redirect to root path
+    window.location.href = '/';
   };
 
   return (

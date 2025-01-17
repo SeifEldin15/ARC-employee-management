@@ -40,9 +40,9 @@ export default function LoginPage() {
       
       // Redirect based on role
       if (response.data.role === 'Manager') {
-        window.location.href = '/managerdashboard';
+        window.location.href = '/Managerdashboard';
       } else {
-        window.location.href = '/dashboard';
+        window.location.href = '/Dashboard';
       }
     } catch (err) {
       console.error('Login error:', {

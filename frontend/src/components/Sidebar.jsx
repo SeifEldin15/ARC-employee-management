@@ -15,28 +15,28 @@ const Sidebar = () => {
     { 
       title: 'Dashboard', 
       icon: <MdDashboard className="text-xl md:text-lg" />, 
-      href: role === 'Manager' ? '/managerdashboard' : '/dashboard'
+      href: role === 'Manager' ? '/Managerdashboard' : '/Dashboard'
     },
     { 
       title: 'Contacts', 
       icon: <MdPeople className="text-xl md:text-lg" />, 
-      href: '/contacts'
+      href: '/Contacts'
     },
     ...(role !== 'Manager' ? [
-      { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/report' },
-      { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/pdf' },
+      { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/Report' },
+      { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/Pdf' },
     ] : []),
-    { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/myreports' },
+    { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/Myreports' },
     ...(role === 'Manager' ? [
       {
         title: 'Team',
         icon: <MdGroups className="text-xl md:text-lg" />,
-        href: '/team'
+        href: '/Team'
       },
       {
         title: 'Contracts',
         icon: <MdDescription className="text-xl md:text-lg" />,
-        href: '/contracts'
+        href: '/Contracts'
       }
     ] : [])
   ];

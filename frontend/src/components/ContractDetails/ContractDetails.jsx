@@ -5,7 +5,9 @@ import { useEffect, useState } from 'react'
 
 const ContractDetails = () => {
   const [contract, setContract] = useState(null)
+  const [visits, setVisits] = useState([])
   const [loading, setLoading] = useState(true)
+  const [deleting, setDeleting] = useState(false)
   const id = window.location.pathname.split('/').pop()
 
   useEffect(() => {
@@ -59,15 +61,61 @@ const ContractDetails = () => {
     fetchContractDetails()
   }, [id])
 
+  const handleDeleteContract = async () => {
+    if (!confirm('Are you sure you want to delete this contract? This action cannot be undone.')) {
+      return
+    }
+
+    setDeleting(true)
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        console.log('No token found in localStorage')
+        return
+      }
+
+      const response = await fetch(`/api/contract/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = '/'
+          return
+        }
+        throw new Error('Failed to delete contract')
+      }
+
+      // Redirect to contracts page after successful deletion
+      window.location.href = '/Contracts'
+    } catch (error) {
+      console.error('Error deleting contract:', error)
+      alert('Failed to delete contract. Please try again.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (loading) return <div className="max-w-7xl mx-auto p-6">Loading...</div>
   if (!contract) return <div className="max-w-7xl mx-auto p-6">Contract not found</div>
 
   return (
     <div className="max-w-7xl mx-auto p-4">
-      <div className="mb-3">
+      <div className="mb-3 flex justify-between items-center">
         <Link href="/contracts" className="text-gray-500 hover:text-gray-700 text-sm">
           ← Back to Contracts
         </Link>
+        <button
+          onClick={handleDeleteContract}
+          disabled={deleting}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm disabled:opacity-50"
+        >
+          {deleting ? 'Deleting...' : 'Delete Contract'}
+        </button>
       </div>
 
       <h1 className="text-xl font-semibold text-gray-800 mb-4">TechCorp Solutions</h1>

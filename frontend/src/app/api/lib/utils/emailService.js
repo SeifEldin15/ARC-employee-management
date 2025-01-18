@@ -1,20 +1,19 @@
 import nodemailer from 'nodemailer';
-import { EMAIL_USER, EMAIL_PASSWORD, EMAIL_SERVICE } from '../config/env.js';
 
-export const sendReminderEmail = async (employeeEmail, missingWeekS) => {
+export const sendReminderEmail = async (employeeEmail, missingWeek) => {
     const transporter = nodemailer.createTransport({
-        service: EMAIL_SERVICE ,
+        service: process.env.EMAIL_SERVICE ,
         auth: {
-            user: EMAIL_USER ,
-            pass: EMAIL_PASSWORD
+            user: process.env.EMAIL_USER ,
+            pass: process.env.EMAIL_PASSWORD
         }
     });
 
     const mailOptions = {
-        from: EMAIL_USER,
+        from: process.env.EMAIL_USER,
         to: employeeEmail,
         subject: 'Missing Utilization Reports Reminder',
-        text: `You have missing utilization reports for the following weeks: ${missingWeekS}. Please submit them as soon as possible.`
+        text: `You have missing utilization reports for the following weeks: ${missingWeek}. Please submit them as soon as possible.`
     };
 
     try {

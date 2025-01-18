@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/app/api/lib/db';
 import Company from '@/app/api/lib/models/Company';
 
+
 export async function POST(request, { params }) {
   try {
     await connectDB();
@@ -11,7 +12,6 @@ export async function POST(request, { params }) {
     if (!company) {
       return NextResponse.json({ message: 'Company not found' }, { status: 404 });
     }
-
     company.contacts.push({ name, email, phone });
     await company.save();
     return NextResponse.json(company, { status: 201 });

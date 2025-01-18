@@ -5,6 +5,7 @@ import  authMiddleware  from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.get('/', authMiddleware ,getCompanies);
+
 router.get('/:companyId/past-visits', authMiddleware, getPastVisitForCompany);
 router.get('/:companyId', authMiddleware , getCompanyDetails);
 router.get('/:companyId/contacts', authMiddleware, getContacts);

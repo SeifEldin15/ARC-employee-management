@@ -22,3 +22,4 @@ export async function GET() {
     return NextResponse.json({ message: 'Error fetching companies', error: error.message }, { status: 500 });
   }
 }
+

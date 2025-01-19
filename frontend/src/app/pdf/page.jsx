@@ -1,6 +1,6 @@
 'use client'
 import Sidebar from '@/components/Sidebar'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 
 const hideSpinButtons = {
@@ -23,7 +23,7 @@ const hideSpinButtons = {
 export default function CustomerServiceReport() {
   // Add state management
   const [formData, setFormData] = useState({
-    spvNumber: '',
+    svrNumber: '',
     serviceEngineer: '',
     customer: '',
     address: '',
@@ -35,17 +35,16 @@ export default function CustomerServiceReport() {
     systemType: '',
     jiraTicketNumber: '',
     WorkWeekNumber: '',
-    weekEndDate: new Date().toISOString(),
-    weeklyTaskReport: Array(7).fill({
-      date: new Date().toISOString(),
+    weekEndDate: '',
+    weeklyTaskReport: Array(7).fill().map(() => ({
+      day: '',
+      date: '',
       travelHours: 0,
       regularHours: 0,
       overtimeHours: 0,
       holidayHours: 0,
-      hourlyRate: 150,
-      totalHours: 0,
-      totalUSD: 0
-    }),
+      hourlyRate: 150
+    })),
     purposeOfVisit: '',
     solution: '',
     recommendations: '',
@@ -55,6 +54,41 @@ export default function CustomerServiceReport() {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Add useEffect to handle URL parameters and initialize dates
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const weekNumber = parseInt(searchParams.get('week')) || 1;
+    
+    // Calculate dates based on week number
+    const currentYear = new Date().getFullYear();
+    const startDate = new Date(currentYear, 0, 1);
+    startDate.setDate(startDate.getDate() + (weekNumber - 1) * 7);
+    
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const weekDates = Array(7).fill().map((_, index) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + index);
+      return date;
+    });
+
+    const endDate = weekDates[6];
+
+    setFormData(prev => ({
+      ...prev,
+      WorkWeekNumber: weekNumber,
+      weekEndDate: endDate.toISOString().split('T')[0],
+      weeklyTaskReport: weekDates.map((date, index) => ({
+        day: days[index],
+        date: date.toISOString().split('T')[0],
+        travelHours: 0,
+        regularHours: 0,
+        overtimeHours: 0,
+        holidayHours: 0,
+        hourlyRate: 150
+      }))
+    }));
+  }, []);
 
   // Add handle input change
   const handleInputChange = (e) => {
@@ -104,27 +138,21 @@ export default function CustomerServiceReport() {
     setLoading(true)
     setError('')
 
-    const formattedWeeklyReport = formData.weeklyTaskReport.map(day => ({
-      ...day,
-      travelHours: parseFloat(day.travelHours) || 0,
-      regularHours: parseFloat(day.regularHours) || 0,
-      overtimeHours: parseFloat(day.overtimeHours) || 0,
-      holidayHours: parseFloat(day.holidayHours) || 0,
-      hourlyRate: parseFloat(day.hourlyRate) || 0,
-      totalHours: parseFloat(day.totalHours) || 0,
-      totalUSD: parseFloat(day.totalUSD) || 0,
-      date: new Date(day.date).toISOString()
-    }));
-
     const submitData = {
       ...formData,
-      weeklyTaskReport: formattedWeeklyReport,
-      weekEndDate: new Date(formData.weekEndDate).toISOString()
+      svrNumber: formData.svrNumber,
+      weeklyTaskReport: formData.weeklyTaskReport.map(day => ({
+        ...day,
+        travelHours: parseFloat(day.travelHours) || 0,
+        regularHours: parseFloat(day.regularHours) || 0,
+        overtimeHours: parseFloat(day.overtimeHours) || 0,
+        holidayHours: parseFloat(day.holidayHours) || 0,
+        hourlyRate: parseFloat(day.hourlyRate) || 0
+      }))
     };
 
     try {
       let token = '';
-      // Only access localStorage on the client side
       if (typeof window !== 'undefined') {
         token = localStorage.getItem('token');
       }
@@ -175,8 +203,8 @@ export default function CustomerServiceReport() {
                   <label className="block text-sm font-medium">SRV Number*</label>
                   <input 
                     type="text" 
-                    name="spvNumber"
-                    value={formData.spvNumber}
+                    name="svrNumber"
+                    value={formData.svrNumber}
                     onChange={handleInputChange}
                     className="mt-1 block w-full border rounded-md px-3 py-2"
                     required 
@@ -279,7 +307,13 @@ export default function CustomerServiceReport() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium">JIRA Ticket Number</label>
-                  <input type="text" className="mt-1 block w-full border rounded-md px-3 py-2" />
+                  <input 
+                    type="text" 
+                    name="jiraTicketNumber"
+                    value={formData.jiraTicketNumber}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full border rounded-md px-3 py-2" 
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium">Work Week Number*</label>
@@ -417,17 +451,35 @@ export default function CustomerServiceReport() {
               
               <div>
                 <label className="block text-sm font-medium mb-2">Solution</label>
-                <textarea rows={4} className="w-full border rounded-md px-3 py-2" />
+                <textarea 
+                  name="solution"
+                  value={formData.solution}
+                  onChange={handleInputChange}
+                  rows={4} 
+                  className="w-full border rounded-md px-3 py-2" 
+                />
               </div>
               
               <div>
                 <label className="block text-sm font-medium mb-2">Recommendations</label>
-                <textarea rows={4} className="w-full border rounded-md px-3 py-2" />
+                <textarea 
+                  name="recommendations"
+                  value={formData.recommendations}
+                  onChange={handleInputChange}
+                  rows={4} 
+                  className="w-full border rounded-md px-3 py-2" 
+                />
               </div>
               
               <div>
                 <label className="block text-sm font-medium mb-2">Additional</label>
-                <textarea rows={4} className="w-full border rounded-md px-3 py-2" />
+                <textarea 
+                  name="additionalNotes"
+                  value={formData.additionalNotes}
+                  onChange={handleInputChange}
+                  rows={4} 
+                  className="w-full border rounded-md px-3 py-2" 
+                />
               </div>
             </div>
 

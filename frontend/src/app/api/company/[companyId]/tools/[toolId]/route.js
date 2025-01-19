@@ -28,4 +28,32 @@ export async function DELETE(request, { params }) {
     }
 }
 
+export async function PUT(request, { params }) {
+    await connectDB();
+
+    const { companyId, toolId } = params;
+    const updateData = await request.json();
+
+    try {
+        const company = await Company.findById(companyId);
+        if (!company) {
+            return NextResponse.json({ message: 'Company not found' }, { status: 404 });
+        }
+
+        const tool = company.tools.id(toolId);
+        if (!tool) {
+            return NextResponse.json({ message: 'Tool not found' }, { status: 404 });
+        }
+
+        // Update tool fields
+        Object.assign(tool, updateData);
+        await company.save();
+
+        return NextResponse.json({ message: 'Tool updated', tool }, { status: 200 });
+    } catch (error) {
+        console.error('Error updating tool:', error);
+        return NextResponse.json({ message: 'Error updating tool', error: error.message }, { status: 500 });
+    }
+}
+
 

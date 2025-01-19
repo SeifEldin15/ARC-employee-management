@@ -69,19 +69,6 @@ const EmployeeDashboard = () => {
     fetchEmployeeData();
   }, []);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Approved':
-        return 'bg-green-100 text-green-800';
-      case 'Submitted':
-        return 'bg-blue-100 text-blue-800';
-      case 'Missing':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   // Update the button click handlers
   const handleViewPdf = (pdfPath) => {
     if (pdfPath) {
@@ -105,16 +92,13 @@ const EmployeeDashboard = () => {
           <div className="text-sm text-gray-600 col-span-2">Date Range</div>
           <div className="text-sm text-gray-600 col-span-2">Utilization</div>
           <div className="text-sm text-gray-600 col-span-3 pl-12">Billable Hours</div>
-          <div className="text-sm text-gray-600 col-span-2">Status</div>
-          <div className="text-sm text-gray-600 col-span-1">Actions</div>
+          <div className="text-sm text-gray-600 col-span-3">Documents</div>
         </div>
 
         {workWeeks.map((week, index) => (
           <div 
             key={week.week} 
-            className={`min-w-[768px] grid grid-cols-12 p-4 border-b last:border-b-0 items-center ${
-              week.status === 'Missing' ? 'bg-red-50' : ''
-            }`}
+            className="min-w-[768px] grid grid-cols-12 p-4 border-b last:border-b-0 items-center"
           >
             <div className="col-span-2 text-sm text-gray-900">{week.week}</div>
             <div className="col-span-2 text-sm text-gray-900">{week.dateRange}</div>
@@ -131,57 +115,33 @@ const EmployeeDashboard = () => {
               </div>
             </div>
             <div className="col-span-3 text-sm text-gray-900 pl-12">{week.billableHours}</div>
-            <div className="col-span-2">
-              <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(week.status)}`}>
-                {week.status}
-              </span>
-            </div>
-            <div className="col-span-1">
+            <div className="col-span-3">
               <div className="flex space-x-2">
-                <button 
-                  className="p-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => handleViewPdf(week.pdfPath)}
-                  disabled={!week.pdfPath}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                {week.pdfPath ? (
+                  <button 
+                    className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md hover:bg-blue-50"
+                    onClick={() => handleViewPdf(week.pdfPath)}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                </button>
-                <button 
-                  className="p-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => handleDownloadCsr(week.csrPath)}
-                  disabled={!week.csrPath}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    Download Utilization
+                  </button>
+                ) : (
+                  <span className="px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md bg-red-50">
+                    Missing Utilization
+                  </span>
+                )}
+                
+                {week.csrPath ? (
+                  <button 
+                    className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 border border-blue-600 rounded-md hover:bg-blue-50"
+                    onClick={() => handleDownloadCsr(week.csrPath)}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                    />
-                  </svg>
-                </button>
+                    Download CSR
+                  </button>
+                ) : (
+                  <span className="px-3 py-1 text-sm text-red-600 border border-red-600 rounded-md bg-red-50">
+                    Missing CSR
+                  </span>
+                )}
               </div>
             </div>
           </div>

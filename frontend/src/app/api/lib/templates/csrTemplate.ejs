@@ -42,7 +42,7 @@
     <div class="header">
         <h1>Customer Service Report (CSR)</h1>
         <p><b>SRV Number:</b> <%= srvNumber %> | <b>Service Engineer:</b> <%= serviceEngineer %></p>
-        <p><b>Work Week:</b> <%= workWeek %> | <b>Week Ending:</b> <%= weekEndDate %></p>
+        <p><b>Work Week:</b> <%= WorkWeekNumber %> | <b>Week Ending:</b> <%= weekEndDate %></p>
     </div>
 
     <div>
@@ -57,6 +57,7 @@
     <table>
         <thead>
             <tr>
+                <th>Day</th>
                 <th>Date</th>
                 <th>Travel Hours</th>
                 <th>Regular Hours</th>
@@ -68,22 +69,42 @@
             </tr>
         </thead>
         <tbody>
-            <% weeklyTaskReport.forEach(day => { %>
+            <% 
+            let totalWeekHours = 0;
+            let totalWeekUSD = 0;
+            
+            weeklyTaskReport.forEach(day => { 
+                const totalHours = (day.travelHours || 0) + 
+                                 (day.regularHours || 0) + 
+                                 (day.overtimeHours || 0) + 
+                                 (day.holidayHours || 0);
+                                 
+                const totalUSD = totalHours * (day.hourlyRate || 0);
+                
+                totalWeekHours += totalHours;
+                totalWeekUSD += totalUSD;
+            %>
             <tr>
+                <td><%= day.day %></td>
                 <td><%= day.date %></td>
                 <td><%= day.travelHours || 0 %></td>
                 <td><%= day.regularHours || 0 %></td>
                 <td><%= day.overtimeHours || 0 %></td>
                 <td><%= day.holidayHours || 0 %></td>
                 <td>$<%= day.hourlyRate || 0 %></td>
-                <td><%= day.totalHours || 0 %></td>
-                <td>$<%= day.totalUSD || 0 %></td>
+                <td><%= totalHours.toFixed(2) %></td>
+                <td>$<%= totalUSD.toFixed(2) %></td>
             </tr>
             <% }) %>
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7"><strong>Totals</strong></td>
+                <td><strong><%= totalWeekHours.toFixed(2) %></strong></td>
+                <td><strong>$<%= totalWeekUSD.toFixed(2) %></strong></td>
+            </tr>
+        </tfoot>
     </table>
-
-    <p><b>Total Week Hours:</b> <%= totals.totalWeekHours %> | <b>Total Week USD:</b> $<%= totals.totalWeekUSD %></p>
 
     <p><b>Purpose of Visit:</b> <%= purposeOfVisit %></p>
     <p><b>Solution:</b> <%= solution %></p>

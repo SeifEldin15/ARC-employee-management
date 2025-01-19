@@ -5,10 +5,10 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     Region: { type: String, enum: ['US-EAST', 'US-WEST','EUROPE','ASIA'] },
     role: { type: String, enum: ['Employee', 'Manager'], required: true },
-    job_title: { type: String },
+    job_title: { type: String, default: 'Employee' },
     email: { type: String, required: true, unique: true },
     phone: { type: String },
-    managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
 });
 
 // Check if model exists before creating

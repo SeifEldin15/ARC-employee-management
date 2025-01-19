@@ -1,11 +1,12 @@
 import { IoCloseCircle } from 'react-icons/io5';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaPen } from 'react-icons/fa';
 import { useState } from 'react';
 
 const Table = ({ tools, companyId, onDeleteTool }) => {
   const userRole = localStorage.getItem('role');
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [editingTool, setEditingTool] = useState(null);
   const [formData, setFormData] = useState({
     PNumber: '',
     toolDescription: '',
@@ -21,14 +22,31 @@ const Table = ({ tools, companyId, onDeleteTool }) => {
     }));
   };
 
+  const handleEdit = (tool) => {
+    setEditingTool(tool);
+    setFormData({
+      PNumber: tool.PNumber,
+      toolDescription: tool.toolDescription,
+      warrantyStart: tool.warrantyStart.split('T')[0], // Format date for input
+      warrantyEnd: tool.warrantyEnd.split('T')[0] // Format date for input
+    });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/company/${companyId}/tools`, {
-        method: 'POST',
+      const url = editingTool 
+        ? `/api/company/${companyId}/tools/${editingTool._id}`
+        : `/api/company/${companyId}/tools`;
+      
+      const method = editingTool ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -37,12 +55,24 @@ const Table = ({ tools, companyId, onDeleteTool }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add tool');
+        throw new Error(`Failed to ${editingTool ? 'update' : 'add'} tool`);
       }
 
-      const newTool = await response.json();
-      onDeleteTool([...tools, newTool]);
+      const data = await response.json();
+      
+      // Update tools list
+      if (editingTool) {
+        const updatedTools = tools.map(tool => 
+          tool._id === editingTool._id ? data.tool : tool
+        );
+        onDeleteTool(updatedTools);
+      } else {
+        onDeleteTool([...tools, data]);
+      }
+
+      // Reset form and close modal
       setShowModal(false);
+      setEditingTool(null);
       setFormData({
         PNumber: '',
         toolDescription: '',
@@ -50,7 +80,7 @@ const Table = ({ tools, companyId, onDeleteTool }) => {
         warrantyEnd: ''
       });
     } catch (error) {
-      console.error('Error adding tool:', error);
+      console.error(`Error ${editingTool ? 'updating' : 'adding'} tool:`, error);
     } finally {
       setIsLoading(false);
     }
@@ -138,10 +168,19 @@ const Table = ({ tools, companyId, onDeleteTool }) => {
                       </td>
                       {userRole === 'Manager' && (
                         <td className="px-4 sm:px-6 py-4 whitespace-normal text-sm text-right">
-                          <IoCloseCircle
-                            className="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer ml-auto"
-                            onClick={() => handleDeleteTool(tool._id)}
-                          />
+                          <div className="flex justify-end items-center space-x-2">
+                            <button
+                              onClick={() => handleEdit(tool)}
+                              className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white hover:bg-blue-700 focus:outline-none"
+                            >
+                              <FaPen className="w-[10px] h-[10px]"/>
+
+                            </button>
+                            <IoCloseCircle
+                              className="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer"
+                              onClick={() => handleDeleteTool(tool._id)}
+                            />
+                          </div>
                         </td>
                       )}
                     </tr>
@@ -158,7 +197,9 @@ const Table = ({ tools, companyId, onDeleteTool }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">Add Tool Details</h3>
+              <h3 className="text-xl font-semibold">
+                {editingTool ? 'Edit Tool Details' : 'Add Tool Details'}
+              </h3>
               <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">
                 ✕
               </button>

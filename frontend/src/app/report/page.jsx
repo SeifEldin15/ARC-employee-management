@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '@/components/Sidebar'
 
 const Report = () => {
@@ -25,27 +25,50 @@ const Report = () => {
     'Select Activity'
   ]
 
-  const [weekStart, setWeekStart] = useState('')
-  const [weekEnd, setWeekEnd] = useState('')
-  const [srvInput, setSrvInput] = useState('')
+  // Get week number from URL
+  const [weekNumber, setWeekNumber] = useState('')
+  
+  // Update state variables - remove weekStart/weekEnd
+  const [srvInputs, setSrvInputs] = useState({}) // Changed to handle multiple SVRs per day
   const [hourInputs, setHourInputs] = useState({})
 
+  // Add useEffect to get week number from URL on component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      setWeekNumber(params.get('week') || '')
+    }
+  }, [])
+
   const handleSubmit = async () => {
-    const formattedData = {
-      workWeek: weekStart,
-      year: new Date(weekStart).getFullYear().toString(),
-      SVR: srvInput,
-      tasks: days.flatMap(day =>
-        activities.slice(0, -1).map(activity => ({
-          category: activity.toLowerCase(),
-          hours: hourInputs[`${day}-${activity}`] || '',
+    // Format SVR data
+    const svrCategory = days.map(day => ({
+      SVR: srvInputs[day] || '',
+      day: day.toLowerCase()
+    })).filter(item => item.SVR !== '')
+
+    // Format tasks data - modified to correctly capture activities and hours
+    const tasks = Object.entries(hourInputs)
+      .map(([key, hours]) => {
+        if (!hours || hours === '0.0') return null;
+        
+        const [day, activity] = key.split('-');
+        return {
+          category: activities[parseInt(activity)].toLowerCase(), // Convert activity index to actual activity name
+          hours: Number(hours),
           day: day
-        }))
-      )
+        };
+      })
+      .filter(task => task !== null);
+
+    const formattedData = {
+      WeekNumber: parseInt(weekNumber), // Ensure week number is sent as integer
+      year: new Date().getFullYear(),
+      SVR_Category: svrCategory,
+      tasks: tasks
     }
 
     try {
-      // Get token only when needed and check if we're in browser environment
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       
       const response = await fetch('/api/reports/utilization', {
@@ -61,7 +84,8 @@ const Report = () => {
       if (response.ok) {
         alert('Report submitted successfully!')
       } else {
-        alert('Failed to submit report')
+        const errorData = await response.json();
+        alert(`Failed to submit report: ${errorData.message || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error submitting report:', error)
@@ -80,21 +104,12 @@ const Report = () => {
             {/* Date Range Inputs */}
             <div className="flex gap-12 mb-8">
               <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-600">Week Starting</label>
+                <label className="text-sm text-gray-600">Week Number</label>
                 <input 
-                  type="date" 
-                  value={weekStart}
-                  onChange={(e) => setWeekStart(e.target.value)}
-                  className="border border-gray-200 rounded px-3 py-1.5 text-sm bg-white" 
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-600">Week Ending</label>
-                <input 
-                  type="date" 
-                  value={weekEnd}
-                  onChange={(e) => setWeekEnd(e.target.value)}
-                  className="border border-gray-200 rounded px-3 py-1.5 text-sm bg-white" 
+                  type="text" 
+                  value={weekNumber}
+                  readOnly
+                  className="border border-gray-200 rounded px-3 py-1.5 text-sm bg-gray-50" 
                 />
               </div>
             </div>
@@ -108,8 +123,11 @@ const Report = () => {
                     <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
                       <input 
                         type="text" 
-                        value={srvInput}
-                        onChange={(e) => setSrvInput(e.target.value)}
+                        value={srvInputs[weekNumber] || ''}
+                        onChange={(e) => setSrvInputs(prev => ({
+                          ...prev, 
+                          [weekNumber]: e.target.value
+                        }))}
                         placeholder="Enter SRV#" 
                         className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
                       />
@@ -137,16 +155,35 @@ const Report = () => {
                   {days.map((day) => (
                     <tr key={day} className="border-b">
                       <td className="py-2 px-4 text-sm text-gray-600">{day}</td>
-                      <td className="py-2 px-4 text-sm text-gray-600">{srvInput}</td>
+                      <td className="py-2 px-4">
+                        <input 
+                          type="text" 
+                          value={srvInputs[day] || ''}
+                          onChange={(e) => setSrvInputs(prev => ({
+                            ...prev, 
+                            [day]: e.target.value
+                          }))}
+                          placeholder="Enter SRV#"
+                          className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
+                        />
+                      </td>
                       {[...Array(numberOfColumns)].map((_, index) => (
                         <td key={index} className="py-2 px-4">
                           <input 
                             type="number" 
                             value={hourInputs[`${day}-${index}`] || '0.0'}
-                            onChange={(e) => setHourInputs(prev => ({
-                              ...prev, 
-                              [`${day}-${index}`]: e.target.value
-                            }))}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || (parseFloat(value) >= 0 && parseFloat(value) <= 24)) {
+                                setHourInputs(prev => ({
+                                  ...prev, 
+                                  [`${day}-${index}`]: value
+                                }))
+                              }
+                            }}
+                            min="0"
+                            max="24"
+                            step="0.5"
                             className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
                           />
                         </td>

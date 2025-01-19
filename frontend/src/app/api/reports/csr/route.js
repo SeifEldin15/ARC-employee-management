@@ -3,7 +3,7 @@ import connectDB from '@/app/api/lib/db';
 import CSR from '@/app/api/lib/models/csr';
 import { verifyAuth } from '@/app/api/lib/auth';
 import { generatePDF } from '@/app/api/lib/utils/PDF';
-
+import { submitReport } from '@/app/api/lib/utils/submitReport';
 export async function POST(request) {
   try {
     await connectDB();
@@ -42,6 +42,9 @@ export async function POST(request) {
       ...data,
       totals: csr.totals
     });
+
+    submitReport(data.WeekNumber , employeeId , "CSR" , pdfPath )
+
 
     csr.pdfPath = pdfPath;
     await csr.save();

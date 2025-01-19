@@ -58,6 +58,16 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDeleteTool = (updatedTools) => {
+    setCompanyData(prev => ({
+      ...prev,
+      details: {
+        ...prev.details,
+        tools_installed: updatedTools
+      }
+    }));
+  };
+
   useEffect(() => {
     const fetchCompanyData = async () => {
       try {
@@ -125,7 +135,11 @@ export default function DashboardPage() {
             onContactAdded={handleContactAdded}
             onDeleteContact={handleDeleteContact}
           />
-          <Table tools={companyData?.details?.tools_installed || []} />
+          <Table 
+            tools={companyData?.details?.tools_installed || []} 
+            companyId={id} 
+            onDeleteTool={handleDeleteTool}
+          />
         </div>
       </div>
     </div>

@@ -28,6 +28,36 @@ export default function DashboardPage() {
     });
   };
 
+  const handleDeleteContact = async (contactId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/company/${id}/contacts/${contactId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete contact');
+      }
+
+      // Update the state to remove the deleted contact
+      setCompanyData(prev => ({
+        ...prev,
+        details: {
+          ...prev.details,
+          contacts: prev.details.contacts.filter(contact => contact._id !== contactId)
+        }
+      }));
+    } catch (error) {
+      console.error('Error deleting contact:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchCompanyData = async () => {
       try {
@@ -93,6 +123,7 @@ export default function DashboardPage() {
             contacts={companyData?.details?.contacts || []} 
             companyId={id}
             onContactAdded={handleContactAdded}
+            onDeleteContact={handleDeleteContact}
           />
           <Table tools={companyData?.details?.tools_installed || []} />
         </div>

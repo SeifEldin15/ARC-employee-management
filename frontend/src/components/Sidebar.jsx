@@ -1,14 +1,27 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { MdDashboard, MdPeople, MdTimeline, MdSupportAgent, MdDescription, MdLogout, MdMenu, MdGroups } from 'react-icons/md';
+import { MdDashboard, MdPeople, MdTimeline, MdSupportAgent, MdDescription, MdLogout, MdMenu, MdGroups, MdAccountCircle } from 'react-icons/md';
 
 const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [role, setRole] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    setRole(localStorage.getItem('role'));
+    // Fetch user info when component mounts
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch('/api/auth/info');
+        const data = await response.json();
+        setUserInfo(data);
+        setRole(data.role);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    };
+
+    fetchUserInfo();
   }, []);
 
   const menuItems = [
@@ -57,12 +70,16 @@ const Sidebar = () => {
         <div className="px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-full bg-gray-700">
-                <img 
-                  src="/default-avatar.png" 
-                  alt="Profile" 
-                  className="w-full h-full rounded-full"
-                />
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                {userInfo?.image ? (
+                  <img 
+                    src={userInfo.image}
+                    alt="Profile" 
+                    className="w-full h-full rounded-full"
+                  />
+                ) : (
+                  <MdAccountCircle className="w-full h-full text-gray-400" />
+                )}
               </div>
             </div>
 
@@ -106,16 +123,20 @@ const Sidebar = () => {
       <nav className="hidden md:flex flex-col bg-gray-900 text-gray-400 w-64 min-h-screen fixed left-0">
         <div className="p-4">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full bg-gray-700">
-              <img 
-                src="/default-avatar.png" 
-                alt="Profile" 
-                className="w-full h-full rounded-full"
-              />
+            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+              {userInfo?.image ? (
+                <img 
+                  src={userInfo.image}
+                  alt="Profile" 
+                  className="w-full h-full rounded-full"
+                />
+              ) : (
+                <MdAccountCircle className="w-full h-full text-gray-400" />
+              )}
             </div>
             <div>
-              <h3 className="text-white text-sm font-medium">John Smith</h3>
-              <p className="text-xs text-gray-500">PSF IV</p>
+              <h3 className="text-white text-sm font-medium">{userInfo?.name || 'Loading...'}</h3>
+              <p className="text-xs text-gray-500">{userInfo?.job_title || 'Employee'}</p>
             </div>
           </div>
         </div>

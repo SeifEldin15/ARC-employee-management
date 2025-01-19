@@ -128,7 +128,11 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <LocationSection address={companyData?.address} region={companyData?.region} />
+          <LocationSection 
+            address={companyData?.address} 
+            region={companyData?.region} 
+            companyId={id} 
+          />
           <ContactSection 
             contacts={companyData?.details?.contacts || []} 
             companyId={id}

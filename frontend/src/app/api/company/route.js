@@ -16,7 +16,7 @@ export async function POST(request) {
 export async function GET() {
   try {
     await connectDB();
-    const companies = await Company.find().select('name address contacts');
+    const companies = await Company.find().select('name address contacts ');
     return NextResponse.json(companies, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error fetching companies', error: error.message }, { status: 500 });

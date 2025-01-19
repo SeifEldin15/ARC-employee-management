@@ -58,37 +58,56 @@ export default function CustomerServiceReport() {
 
   // Add useEffect to handle URL parameters and initialize dates
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const weekNumber = parseInt(searchParams.get('week')) || 1;
-    
-    // Calculate dates based on week number
-    const currentYear = new Date().getFullYear();
-    const startDate = new Date(currentYear, 0, 1);
-    startDate.setDate(startDate.getDate() + (weekNumber - 1) * 7);
-    
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const weekDates = Array(7).fill().map((_, index) => {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + index);
-      return date;
-    });
+    const fetchCurrentWeek = async () => {
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        let weekNumber = parseInt(searchParams.get('week'));
+        
+        if (!weekNumber) {
+          // Fetch current week from API if not provided in URL
+          const response = await axios.get('/api/currentWeek');
+          weekNumber = response.data.weekNumber;
+          
+          // Update URL with the week number without page reload
+          const newUrl = `${window.location.pathname}?week=${weekNumber}`;
+          window.history.pushState({ path: newUrl }, '', newUrl);
+        }
+        
+        // Calculate dates based on week number
+        const currentYear = new Date().getFullYear();
+        const startDate = new Date(currentYear, 0, 1);
+        startDate.setDate(startDate.getDate() + (weekNumber - 1) * 7);
+        
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const weekDates = Array(7).fill().map((_, index) => {
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + index);
+          return date;
+        });
 
-    const endDate = weekDates[6];
+        const endDate = weekDates[6];
 
-    setFormData(prev => ({
-      ...prev,
-      WorkWeekNumber: weekNumber,
-      weekEndDate: endDate.toISOString().split('T')[0],
-      weeklyTaskReport: weekDates.map((date, index) => ({
-        day: days[index],
-        date: date.toISOString().split('T')[0],
-        travelHours: 0,
-        regularHours: 0,
-        overtimeHours: 0,
-        holidayHours: 0,
-        hourlyRate: 150
-      }))
-    }));
+        setFormData(prev => ({
+          ...prev,
+          WorkWeekNumber: weekNumber,
+          weekEndDate: endDate.toISOString().split('T')[0],
+          weeklyTaskReport: weekDates.map((date, index) => ({
+            day: days[index],
+            date: date.toISOString().split('T')[0],
+            travelHours: 0,
+            regularHours: 0,
+            overtimeHours: 0,
+            holidayHours: 0,
+            hourlyRate: 150
+          }))
+        }));
+      } catch (error) {
+        console.error('Error fetching current week:', error);
+        setError('Failed to fetch current week');
+      }
+    };
+
+    fetchCurrentWeek();
   }, []);
 
   // Add useEffect to get companyId from localStorage
@@ -340,9 +359,9 @@ export default function CustomerServiceReport() {
                     type="number"
                     name="WorkWeekNumber"
                     value={formData.WorkWeekNumber}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full border rounded-md px-3 py-2"
+                    className="mt-1 block w-full border rounded-md px-3 py-2 bg-gray-100"
                     required 
+                    readOnly
                   />
                 </div>
               </div>

@@ -104,28 +104,32 @@ const Dashboard = () => {
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-right">
                     <button 
-                      onClick={() => handleDownload(report.utilizationReport, 'utilization')}
+                      onClick={() => report.utilizationReport === 'Not submitted' 
+                        ? window.location.href = `/report?week=${report.weekNumber}`
+                        : handleDownload(report.utilizationReport, 'utilization')
+                      }
                       className={`w-full sm:w-auto ${
                         report.utilizationReport === 'Not submitted' 
-                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                          ? 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800'
                           : 'bg-green-100 hover:bg-green-200 text-green-800'
                       } px-3 py-1 rounded text-sm`}
-                      disabled={report.utilizationReport === 'Not submitted'}
                     >
-                      {report.utilizationReport === 'Not submitted' ? 'Not Available' : 'Download Utilization'}
+                      {report.utilizationReport === 'Not submitted' ? 'Submit' : 'Download Utilization'}
                     </button>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap text-right">
                     <button 
-                      onClick={() => handleDownload(report.csrReport, 'csr')}
+                      onClick={() => report.csrReport === 'Not submitted'
+                        ? window.location.href = `/pdf?week=${report.weekNumber}`
+                        : handleDownload(report.csrReport, 'csr')
+                      }
                       className={`w-full sm:w-auto ${
                         report.csrReport === 'Not submitted'
-                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                          ? 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800'
                           : 'bg-blue-500 hover:bg-blue-600 text-white'
                       } px-3 py-1 rounded text-sm`}
-                      disabled={report.csrReport === 'Not submitted'}
                     >
-                      {report.csrReport === 'Not submitted' ? 'Not Available' : 'Download CSR'}
+                      {report.csrReport === 'Not submitted' ? 'Submit' : 'Download CSR'}
                     </button>
                   </td>
                 </tr>

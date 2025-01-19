@@ -62,8 +62,8 @@ export default function MyReports() {
                 <div className="flex gap-2">
                   {report.csrReport === "Not submitted" ? (
                     <a 
-                      href={`/report?week=${report.weekNumber}`}
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+                      href={`/pdf?week=${report.weekNumber}`}
+                      className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors text-sm"
                     >
                       Submit CSR
                     </a>
@@ -78,7 +78,7 @@ export default function MyReports() {
                   {report.utilizationReport === "Not submitted" ? (
                     <a 
                       href={`/report?week=${report.weekNumber}`}
-                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors text-sm"
+                      className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors text-sm"
                     >
                       Submit Utilization
                     </a>

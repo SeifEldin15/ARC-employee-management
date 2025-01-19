@@ -24,8 +24,9 @@ export default function MyReports() {
           id: `week-${report.weekNumber}-${report.dateRange}`,
           title: `Work Week ${report.weekNumber}`,
           dateRange: report.dateRange,
-          hasCSV: Boolean(report.csrReport),
-          hasUtilization: Boolean(report.utilizationReport)
+          weekNumber: report.weekNumber,
+          csrReport: report.csrReport,
+          utilizationReport: report.utilizationReport
         }))
         
         setReports(formattedReports)
@@ -59,15 +60,35 @@ export default function MyReports() {
                 </div>
                 
                 <div className="flex gap-2">
-                  {report.hasCSV && (
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm">
+                  {report.csrReport === "Not submitted" ? (
+                    <a 
+                      href={`/report?week=${report.weekNumber}`}
+                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+                    >
+                      Submit CSR
+                    </a>
+                  ) : report.csrReport && (
+                    <a 
+                      href={report.csrReport}
+                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+                    >
                       Download CSR
-                    </button>
+                    </a>
                   )}
-                  {report.hasUtilization && (
-                    <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors text-sm">
+                  {report.utilizationReport === "Not submitted" ? (
+                    <a 
+                      href={`/report?week=${report.weekNumber}`}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors text-sm"
+                    >
+                      Submit Utilization
+                    </a>
+                  ) : report.utilizationReport && (
+                    <a 
+                      href={report.utilizationReport}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors text-sm"
+                    >
                       Download Utilization
-                    </button>
+                    </a>
                   )}
                 </div>
               </div>

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { FaUser, FaEnvelope, FaPhone, FaPlus } from 'react-icons/fa';
+import { IoCloseCircle } from 'react-icons/io5';
 
-const ContactSection = ({ contacts, companyId, onContactAdded }) => {
+const ContactSection = ({ contacts, companyId, onContactAdded, onDeleteContact, isManager }) => {
   const userRole = localStorage.getItem('role');
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -64,20 +65,30 @@ const ContactSection = ({ contacts, companyId, onContactAdded }) => {
       <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center mt-8">Contacts</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {contacts.map((contact) => (
-          <div key={contact._id} className="bg-white shadow-[0_0_8px_rgba(0,0,0,0.15)] rounded-lg p-6">
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 flex items-center justify-center">
-                <FaUser className="w-5 h-5 text-black" />
+          <div key={contact._id} className="relative">
+            {userRole === 'Manager' && (
+              <div className="absolute top-2 right-2 z-10">
+                <IoCloseCircle
+                  className="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer"
+                  onClick={() => onDeleteContact(contact._id)}
+                />
               </div>
-              <h3 className="text-lg font-medium text-gray-900">{contact.name}</h3>
-              <a href={`mailto:${contact.email}`} className="text-sm text-gray-900 hover:text-blue-800 flex items-center mb-2">
-                <FaEnvelope className="w-4 h-4 mr-2 text-blue-600" />
-                {contact.email}
-              </a>
-              <a href={`tel:${contact.phone}`} className="text-sm text-gray-900 hover:text-blue-800 flex items-center">
-                <FaPhone className="w-4 h-4 mr-2 text-blue-600" />
-                {contact.phone}
-              </a>
+            )}
+            <div className="bg-white shadow-[0_0_8px_rgba(0,0,0,0.15)] rounded-lg p-6">
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <FaUser className="w-5 h-5 text-black" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900">{contact.name}</h3>
+                <a href={`mailto:${contact.email}`} className="text-sm text-gray-900 hover:text-blue-800 flex items-center mb-2">
+                  <FaEnvelope className="w-4 h-4 mr-2 text-blue-600" />
+                  {contact.email}
+                </a>
+                <a href={`tel:${contact.phone}`} className="text-sm text-gray-900 hover:text-blue-800 flex items-center">
+                  <FaPhone className="w-4 h-4 mr-2 text-blue-600" />
+                  {contact.phone}
+                </a>
+              </div>
             </div>
           </div>
         ))}

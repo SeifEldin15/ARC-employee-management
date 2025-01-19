@@ -105,10 +105,11 @@ const EmployeeDashboard = () => {
             <div className="col-span-2">
               <div className="relative flex-1 bg-gray-200 rounded-full h-5 overflow-hidden mr-6">
                 <div
-                  className="absolute top-0 left-0 bg-blue-500 h-full rounded-full transition-all duration-300 flex items-center justify-center"
+                  className="absolute top-0 left-0 bg-blue-500 h-full rounded-full transition-all duration-300"
                   style={{ width: `${week.utilization}%` }}
-                >
-                  <span className="text-xs text-white font-medium px-1">
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs text-black font-medium px-1">
                     {week.utilization}%
                   </span>
                 </div>

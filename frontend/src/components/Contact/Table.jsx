@@ -104,14 +104,14 @@ const Table = ({ tools, companyId, onDeleteTool }) => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {userRole === 'Manager' && (
-                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
-                  )}
                   <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">ID</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tool Description</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Warranty Start</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Warranty End</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Warranty Status</th>
+                  {userRole === 'Manager' && (
+                    <th className="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -119,14 +119,6 @@ const Table = ({ tools, companyId, onDeleteTool }) => {
                   const isInWarranty = new Date(tool.warrantyEnd) > new Date();
                   return (
                     <tr key={tool._id} className="hover:bg-gray-50">
-                      {userRole === 'Manager' && (
-                        <td className="px-4 sm:px-6 py-4 whitespace-normal text-sm">
-                          <IoCloseCircle
-                            className="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer"
-                            onClick={() => handleDeleteTool(tool._id)}
-                          />
-                        </td>
-                      )}
                       <td className="px-4 sm:px-6 py-4 whitespace-normal text-sm text-gray-900">{tool.PNumber}</td>
                       <td className="px-4 sm:px-6 py-4 whitespace-normal text-sm text-gray-900">{tool.toolDescription}</td>
                       <td className="px-4 sm:px-6 py-4 whitespace-normal text-sm text-gray-900">
@@ -144,6 +136,14 @@ const Table = ({ tools, companyId, onDeleteTool }) => {
                           {isInWarranty ? 'In Warranty' : 'Out of Warranty'}
                         </span>
                       </td>
+                      {userRole === 'Manager' && (
+                        <td className="px-4 sm:px-6 py-4 whitespace-normal text-sm text-right">
+                          <IoCloseCircle
+                            className="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer ml-auto"
+                            onClick={() => handleDeleteTool(tool._id)}
+                          />
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

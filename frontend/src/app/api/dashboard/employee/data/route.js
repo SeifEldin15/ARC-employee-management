@@ -19,9 +19,7 @@ export async function GET(request) {
 
 
         const workweeks = await Workweek.find({}).sort({ weekNumber: 1 });
-        console.log(workweeks);
-
-
+        
         // Loop through all weeks of the current year
         for (const week of workweeks) {
             const utilizationRecords = await Utilization.find({
@@ -31,6 +29,16 @@ export async function GET(request) {
             });
 
             let reportsSubmitted = 0 ;
+             // Reset hoursPerDay for each week
+             const hoursPerDay = {
+                Sunday: 0,
+                Monday: 0,
+                Tuesday: 0,
+                Wednesday: 0,
+                Thursday: 0,
+                Friday: 0,
+                Saturday: 0
+            };
 
             // Check which employees submitted reports for the current week
             for (const record of utilizationRecords) {
@@ -38,10 +46,20 @@ export async function GET(request) {
                 reportsSubmitted += submitted ? 1 : 0;
             }
 
+            utilizationRecords.forEach(record => {
+                record.tasks.forEach(task => {
+                    if (hoursPerDay[task.day] !== undefined) {
+                        hoursPerDay[task.day] += task.hours; 
+                    }
+                });
+            });
+
             reportSummary.push({
                 week: week.weekNumber,
                 year: week.year,
                 reportsSubmitted: reportsSubmitted, 
+                hoursPerDay 
+
             });
         }
 

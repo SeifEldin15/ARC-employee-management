@@ -40,7 +40,8 @@ export async function POST(request) {
 
     const pdfPath = await generatePDF('csrTemplate', {
       ...data,
-      totals: csr.totals
+      totals: csr.totals,
+      workWeek: data.workWeek
     });
 
     submitReport(data.WeekNumber , employeeId , "CSR" , pdfPath )

@@ -3,6 +3,7 @@ import connectDB from '@/app/api/lib/db';
 import Utilization from '@/app/api/lib/models/utilization';
 import { verifyAuth } from '@/app/api/lib/auth';
 import { generatePDF } from '@/app/api/lib/utils/PDF';
+import { submitReport } from '@/app/api/lib/utils/submitReport';
 
 export async function POST(request) {
   try {
@@ -14,6 +15,7 @@ export async function POST(request) {
     }
 
     const data = await request.json();
+    console.log(data);
     const employeeId = user._id;
 
     const totalHours = data.tasks.reduce((sum, task) => sum + task.hours, 0);
@@ -24,6 +26,7 @@ export async function POST(request) {
       totalHours
     });
 
+
     // Generate PDF using the utility function
     const pdfPath = await generatePDF('utilizationReport', {
       ...data,
@@ -31,11 +34,13 @@ export async function POST(request) {
     });
 
     report.pdfPath = pdfPath;
+
+    submitReport(data.WeekNumber , employeeId ,"Utilization" , pdfPath )
+
     await report.save();
 
     return NextResponse.json({ 
       message: 'Utilization report submitted successfully!',
-      pdfPath 
     }, { status: 200 });
 
   } catch (error) {

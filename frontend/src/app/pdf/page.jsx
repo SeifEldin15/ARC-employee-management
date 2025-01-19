@@ -23,7 +23,7 @@ const hideSpinButtons = {
 export default function CustomerServiceReport() {
   // Add state management
   const [formData, setFormData] = useState({
-    svrNumber: '',
+    srvNumber: '',
     serviceEngineer: '',
     customer: '',
     address: '',
@@ -49,7 +49,8 @@ export default function CustomerServiceReport() {
     solution: '',
     recommendations: '',
     additionalNotes: '',
-    returnVisitRequired: false
+    returnVisitRequired: false,
+    companyId: '6782d0a60b59aba0fc7ae808'
   })
 
   const [loading, setLoading] = useState(false)
@@ -88,6 +89,17 @@ export default function CustomerServiceReport() {
         hourlyRate: 150
       }))
     }));
+  }, []);
+
+  // Add useEffect to get companyId from localStorage
+  useEffect(() => {
+    const companyId = localStorage.getItem('companyId');
+    if (companyId) {
+      setFormData(prev => ({
+        ...prev,
+        companyId
+      }));
+    }
   }, []);
 
   // Add handle input change
@@ -140,7 +152,7 @@ export default function CustomerServiceReport() {
 
     const submitData = {
       ...formData,
-      svrNumber: formData.svrNumber,
+      srvNumber: formData.srvNumber,
       weeklyTaskReport: formData.weeklyTaskReport.map(day => ({
         ...day,
         travelHours: parseFloat(day.travelHours) || 0,
@@ -150,6 +162,19 @@ export default function CustomerServiceReport() {
         hourlyRate: parseFloat(day.hourlyRate) || 0
       }))
     };
+
+    // Validate required fields
+    if (!submitData.srvNumber) {
+      setError('SRV Number is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!submitData.companyId) {
+      setError('Company ID is missing. Please log in again.');
+      setLoading(false);
+      return;
+    }
 
     try {
       let token = '';
@@ -203,8 +228,8 @@ export default function CustomerServiceReport() {
                   <label className="block text-sm font-medium">SRV Number*</label>
                   <input 
                     type="text" 
-                    name="svrNumber"
-                    value={formData.svrNumber}
+                    name="srvNumber"
+                    value={formData.srvNumber}
                     onChange={handleInputChange}
                     className="mt-1 block w-full border rounded-md px-3 py-2"
                     required 
@@ -307,13 +332,7 @@ export default function CustomerServiceReport() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium">JIRA Ticket Number</label>
-                  <input 
-                    type="text" 
-                    name="jiraTicketNumber"
-                    value={formData.jiraTicketNumber}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full border rounded-md px-3 py-2" 
-                  />
+                  <input type="text" className="mt-1 block w-full border rounded-md px-3 py-2" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium">Work Week Number*</label>

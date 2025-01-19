@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import Sidebar from '@/components/Sidebar'
 
 const Report = () => {
-  // Define number of columns we want
-  const numberOfColumns = 4;
+  // Change from const to state for number of columns
+  const [numberOfColumns, setNumberOfColumns] = useState(3);
   
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const activities = [
@@ -29,8 +29,48 @@ const Report = () => {
   const [weekNumber, setWeekNumber] = useState('')
   
   // Update state variables - remove weekStart/weekEnd
-  const [srvInputs, setSrvInputs] = useState({}) // Changed to handle multiple SVRs per day
+  const [srvInput, setSrvInput] = useState('');
   const [hourInputs, setHourInputs] = useState({})
+
+  // Add state for total hours
+  const [totalHours, setTotalHours] = useState(0);
+
+  // Function to calculate daily and total hours
+  const calculateHours = (inputs) => {
+    let total = 0;
+    const dailyTotals = {};
+
+    Object.entries(inputs).forEach(([key, value]) => {
+      const [day, _] = key.split('-');
+      const hours = parseFloat(value) || 0;
+      
+      if (!dailyTotals[day]) {
+        dailyTotals[day] = 0;
+      }
+      dailyTotals[day] += hours;
+      total += hours;
+    });
+
+    setTotalHours(total);
+    return dailyTotals;
+  };
+
+  // Add column handler
+  const handleAddColumn = () => {
+    setNumberOfColumns(prev => prev + 1);
+  };
+
+  // Update hour input handler to calculate totals
+  const handleHourInput = (day, index, value) => {
+    if (value === '' || (parseFloat(value) >= 0 && parseFloat(value) <= 24)) {
+      const newHourInputs = {
+        ...hourInputs,
+        [`${day}-${index}`]: value
+      };
+      setHourInputs(newHourInputs);
+      calculateHours(newHourInputs);
+    }
+  };
 
   // Add useEffect to get week number from URL on component mount
   useEffect(() => {
@@ -41,11 +81,11 @@ const Report = () => {
   }, [])
 
   const handleSubmit = async () => {
-    // Format SVR data
+    // Format SVR data - now using single SRV for all days
     const svrCategory = days.map(day => ({
-      SVR: srvInputs[day] || '',
+      SVR: srvInput,
       day: day.toLowerCase()
-    })).filter(item => item.SVR !== '')
+    }));
 
     // Format tasks data - modified to correctly capture activities and hours
     const tasks = Object.entries(hourInputs)
@@ -101,7 +141,7 @@ const Report = () => {
           <div className="max-w-7xl mx-auto">
             <h1 className="text-xl font-normal text-gray-700 mb-8 text-center">Weekly Utilization Report</h1>
             
-            {/* Date Range Inputs */}
+            {/* Date Range Input */}
             <div className="flex gap-12 mb-8">
               <div className="flex items-center gap-3">
                 <label className="text-sm text-gray-600">Week Number</label>
@@ -123,13 +163,10 @@ const Report = () => {
                     <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
                       <input 
                         type="text" 
-                        value={srvInputs[weekNumber] || ''}
-                        onChange={(e) => setSrvInputs(prev => ({
-                          ...prev, 
-                          [weekNumber]: e.target.value
-                        }))}
-                        placeholder="Enter SRV#" 
-                        className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
+                        value={srvInput}
+                        onChange={(e) => setSrvInput(e.target.value)}
+                        placeholder="Enter SRV#"
+                        className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white" 
                       />
                     </th>
                     {[...Array(numberOfColumns)].map((_, index) => (
@@ -143,7 +180,10 @@ const Report = () => {
                       </th>
                     ))}
                     <th className="py-3 px-2 w-10">
-                      <button className="p-1 rounded-full bg-blue-500 text-white">
+                      <button 
+                        onClick={handleAddColumn}
+                        className="p-1 rounded-full bg-blue-500 text-white hover:bg-blue-600"
+                      >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
@@ -152,51 +192,39 @@ const Report = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {days.map((day) => (
-                    <tr key={day} className="border-b">
-                      <td className="py-2 px-4 text-sm text-gray-600">{day}</td>
-                      <td className="py-2 px-4">
-                        <input 
-                          type="text" 
-                          value={srvInputs[day] || ''}
-                          onChange={(e) => setSrvInputs(prev => ({
-                            ...prev, 
-                            [day]: e.target.value
-                          }))}
-                          placeholder="Enter SRV#"
-                          className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
-                        />
-                      </td>
-                      {[...Array(numberOfColumns)].map((_, index) => (
-                        <td key={index} className="py-2 px-4">
-                          <input 
-                            type="number" 
-                            value={hourInputs[`${day}-${index}`] || '0.0'}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (value === '' || (parseFloat(value) >= 0 && parseFloat(value) <= 24)) {
-                                setHourInputs(prev => ({
-                                  ...prev, 
-                                  [`${day}-${index}`]: value
-                                }))
-                              }
-                            }}
-                            min="0"
-                            max="24"
-                            step="0.5"
-                            className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
-                          />
-                        </td>
-                      ))}
-                      <td className="py-2 px-4 text-sm text-gray-600 text-right">8.0</td>
-                      <td className="py-2 px-2"></td>
-                    </tr>
-                  ))}
+                  {days.map((day) => {
+                    const dailyTotal = Object.entries(hourInputs)
+                      .filter(([key]) => key.startsWith(day))
+                      .reduce((sum, [_, value]) => sum + (parseFloat(value) || 0), 0);
+
+                    return (
+                      <tr key={day} className="border-b">
+                        <td className="py-2 px-4 text-sm text-gray-600">{day}</td>
+                        <td className="py-2 px-4 text-sm text-gray-600">{srvInput}</td>
+                        {[...Array(numberOfColumns)].map((_, index) => (
+                          <td key={index} className="py-2 px-4">
+                            <input 
+                              type="number" 
+                              value={hourInputs[`${day}-${index}`] || '0.0'}
+                              onChange={(e) => handleHourInput(day, index, e.target.value)}
+                              min="0"
+                              max="24"
+                              step="0.5"
+                              className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
+                            />
+                          </td>
+                        ))}
+                        <td className="py-2 px-4 text-sm text-gray-600 text-right">{dailyTotal.toFixed(1)}</td>
+                        <td className="py-2 px-2"></td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan="2" className="py-3 px-4 text-sm font-medium text-gray-600">Total Hours</td>
-                    <td colSpan={activities.length + 2} className="py-3 px-4 text-sm font-medium text-gray-600 text-right">48.0</td>
+                    <td colSpan={numberOfColumns + 3} className="py-3 px-4 text-sm font-medium text-gray-600 text-right">
+                      {totalHours.toFixed(1)}
+                    </td>
                   </tr>
                 </tfoot>
               </table>

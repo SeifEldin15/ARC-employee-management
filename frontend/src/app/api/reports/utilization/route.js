@@ -15,17 +15,30 @@ export async function POST(request) {
     }
 
     const data = await request.json();
-    console.log(data);
     const employeeId = user._id;
 
+    // Check if the tasks array is empty
+
+    if(!data.weekNumber ){
+      return NextResponse.json({ message: 'Week number is required.' }, { status: 400 });
+    }
+    
+    if (!data.tasks || data.tasks.length === 0) {
+      return NextResponse.json({ message: 'No tasks submitted for this week.' }, { status: 400 });
+    }
+
     const totalHours = data.tasks.reduce((sum, task) => sum + task.hours, 0);
+
+    // Check if total hours is zero
+    if (totalHours === 0) {
+      return NextResponse.json({ message: 'Total hours cannot be zero.' }, { status: 400 });
+    }
 
     const report = new Utilization({
       employeeId,
       ...data,
       totalHours
     });
-
 
     // Generate PDF using the utility function
     const pdfPath = await generatePDF('utilizationReport', {
@@ -35,7 +48,8 @@ export async function POST(request) {
 
     report.pdfPath = pdfPath;
 
-    submitReport(data.WeekNumber , employeeId ,"Utilization" , pdfPath )
+    // Submit the report
+    await submitReport(data.WeekNumber, employeeId, "Utilization", pdfPath);
 
     await report.save();
 

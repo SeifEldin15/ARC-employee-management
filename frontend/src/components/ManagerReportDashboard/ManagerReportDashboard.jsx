@@ -19,13 +19,13 @@ export default function ManagerReports() {
             <thead>
               <tr>
                 <td className="p-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex-1" />
-                    <div className="text-center flex-1">
+                  <div className="flex flex-col sm:flex-row justify-between items-center">
+                    <div className="sm:flex-1" />
+                    <div className="text-center sm:flex-1">
                       <div className="text-sm text-gray-500">CURRENT WEEK</div>
                       <div className="text-gray-700">Week of Dec 3 - Dec 9, 2024</div>
                     </div>
-                    <div className="flex-1 flex justify-end">
+                    <div className="sm:flex-1 flex justify-center sm:justify-end mt-2 sm:mt-0">
                       <button className="flex items-center gap-2 text-blue-500 text-sm hover:text-blue-600">
                         <FaFileDownload />
                         Download PDF
@@ -56,13 +56,13 @@ export default function ManagerReports() {
               ].map((report, index) => (
                 <tr key={index}>
                   <td className="p-4 border-b border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <div className="flex-1" />
-                      <div className="text-center flex-1">
+                    <div className="flex flex-col sm:flex-row justify-between items-center">
+                      <div className="sm:flex-1" />
+                      <div className="text-center sm:flex-1">
                         <div className="text-gray-700">{report.week}</div>
                         <div className="text-sm text-gray-400">{report.generated}</div>
                       </div>
-                      <div className="flex-1 flex justify-end">
+                      <div className="sm:flex-1 flex justify-center sm:justify-end mt-2 sm:mt-0">
                         <button className="flex items-center gap-2 text-blue-500 text-sm hover:text-blue-600">
                           <FaFileDownload />
                           Download

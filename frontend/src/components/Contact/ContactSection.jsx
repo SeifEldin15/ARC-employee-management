@@ -8,7 +8,8 @@ const ContactSection = ({ contacts, companyId, onContactAdded, onDeleteContact, 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    role: ''
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,11 +45,12 @@ const ContactSection = ({ contacts, companyId, onContactAdded, onDeleteContact, 
           _id: newContact._id,
           name: formData.name,
           email: formData.email,
-          phone: formData.phone
+          phone: formData.phone,
+          role: formData.role
         };
         onContactAdded(formattedContact);
         setShowModal(false);
-        setFormData({ name: '', email: '', phone: '' });
+        setFormData({ name: '', email: '', phone: '', role: '' });
       } else {
         const errorData = await response.json();
         console.error('Failed to add contact:', errorData.message);
@@ -80,6 +82,9 @@ const ContactSection = ({ contacts, companyId, onContactAdded, onDeleteContact, 
                   <FaUser className="w-5 h-5 text-black" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900">{contact.name}</h3>
+                {contact.role && (
+                  <p className="text-sm text-gray-600 mb-2">{contact.role}</p>
+                )}
                 <a href={`mailto:${contact.email}`} className="text-sm text-gray-900 hover:text-blue-800 flex items-center mb-2">
                   <FaEnvelope className="w-4 h-4 mr-2 text-blue-600" />
                   {contact.email}
@@ -161,6 +166,19 @@ const ContactSection = ({ contacts, companyId, onContactAdded, onDeleteContact, 
                   value={formData.phone}
                   onChange={handleInputChange}
                   placeholder="Enter phone number"
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 mb-2">Role</label>
+                <input
+                  type="text"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  placeholder="Enter contact role"
                   className="w-full p-2 border rounded-lg"
                   required
                 />

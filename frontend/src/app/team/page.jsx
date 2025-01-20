@@ -4,6 +4,7 @@ import { BsTelephoneFill } from 'react-icons/bs';
 import { MdEmail } from 'react-icons/md';
 import { IoCloseCircle } from 'react-icons/io5';
 import Sidebar from '@/components/Sidebar';
+import LoadingScreen from '@/components/LoadingScreen';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
@@ -21,6 +22,7 @@ export default function TeamPage() {
     phone: ''
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchTeamMembers = async () => {
@@ -39,7 +41,6 @@ export default function TeamPage() {
         
         console.log('Team members response:', response.data);
         
-        // Transform the flat array into grouped object by region
         const groupedMembers = response.data.reduce((acc, member) => {
           const region = member.Region;
           if (!acc[region]) {
@@ -65,6 +66,8 @@ export default function TeamPage() {
           status: error.response?.status
         });
         setError(error.response?.data?.message || 'Error fetching team members');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -193,79 +196,83 @@ export default function TeamPage() {
     <div className="min-h-screen">
       <Sidebar />
       <div className="md:ml-64 flex-1">
-        <div className="md:p-8 p-4 pt-20 md:pt-8">
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
-          <div className="max-w-7xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className=" ">Team Members</h1>
-              
-              <div className="flex gap-4 items-center">
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by name, title, or region..."
-                  className="w-56 p-2 border rounded-lg text-sm"
-                />
-                <button 
-                  onClick={() => setIsModalOpen(true)}
-                  className="bg-blue-500 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 whitespace-nowrap text-sm"
-                >
-                  + Add Employee
-                </button>
+        {isLoading ? (
+          <LoadingScreen />
+        ) : (
+          <div className="md:p-8 p-4 pt-20 md:pt-8">
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                {error}
               </div>
-            </div>
+            )}
+            <div className="max-w-7xl mx-auto">
+              <div className="flex justify-between items-center mb-8">
+                <h1 className=" ">Team Members</h1>
+                
+                <div className="flex gap-4 items-center">
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by name, title, or region..."
+                    className="w-56 p-2 border rounded-lg text-sm"
+                  />
+                  <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="bg-blue-500 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 whitespace-nowrap text-sm"
+                  >
+                    + Add Employee
+                  </button>
+                </div>
+              </div>
 
-            {Object.entries(filteredTeamMembers).map(([region, members]) => (
-              <div key={region} className="mb-12">
-                <h2 className="text-gray-600 text-sm font-medium mb-4">{region}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {members.map((member) => (
-                    <div 
-                      key={member.email} 
-                      className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer hover:shadow-md transition-shadow relative"
-                      onClick={() => handleEmployeeClick(member.id)}
-                    >
-                      <div className="absolute top-2 right-2">
-                        <IoCloseCircle
-                          className="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer"
-                          onClick={(e) => handleDeleteMember(member.id, e)}
-                        />
-                      </div>
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                          {member.initials}
+              {Object.entries(filteredTeamMembers).map(([region, members]) => (
+                <div key={region} className="mb-12">
+                  <h2 className="text-gray-600 text-sm font-medium mb-4">{region}</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {members.map((member) => (
+                      <div 
+                        key={member.email} 
+                        className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer hover:shadow-md transition-shadow relative"
+                        onClick={() => handleEmployeeClick(member.id)}
+                      >
+                        <div className="absolute top-2 right-2">
+                          <IoCloseCircle
+                            className="w-6 h-6 text-red-500 hover:text-red-700 cursor-pointer"
+                            onClick={(e) => handleDeleteMember(member.id, e)}
+                          />
                         </div>
-                        <div className="flex flex-col items-center justify-center flex-grow">
-                          <h3 className="font-medium text-center text-sm">{member.name}</h3>
-                          <div className="flex justify-center mt-2">
-                            <p className="text-xs text-gray-900 bg-gray-100 rounded px-2 py-0.5 inline-block">
-                              {member.title}
-                            </p>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                            {member.initials}
+                          </div>
+                          <div className="flex flex-col items-center justify-center flex-grow">
+                            <h3 className="font-medium text-center text-sm">{member.name}</h3>
+                            <div className="flex justify-center mt-2">
+                              <p className="text-xs text-gray-900 bg-gray-100 rounded px-2 py-0.5 inline-block">
+                                {member.title}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <BsTelephoneFill className="w-4 h-4 text-blue-500" />
+                            {member.phone}
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <MdEmail className="w-4 h-4 text-blue-500" />
+                            {member.email}
                           </div>
                         </div>
                       </div>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <BsTelephoneFill className="w-4 h-4 text-blue-500" />
-                          {member.phone}
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <MdEmail className="w-4 h-4 text-blue-500" />
-                          {member.email}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {isModalOpen && (

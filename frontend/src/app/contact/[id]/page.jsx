@@ -6,11 +6,13 @@ import Link from 'next/link';
 import ContactSection from '@/components/Contact/ContactSection';
 import Table from '@/components/Contact/Table';
 import { useEffect, useState } from 'react';
+import LoadingScreen from '@/components/LoadingScreen';
 
 export default function DashboardPage() {
   const params = useParams();
   const id = params.id;
   const [companyData, setCompanyData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleContactAdded = (newContact) => {
     console.log('Previous state:', companyData);
@@ -100,6 +102,8 @@ export default function DashboardPage() {
         setCompanyData(data);
       } catch (error) {
         console.error('Error fetching company data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -110,41 +114,45 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <Sidebar />
       <div className="md:ml-64 flex-1">
-        <div className="md:p-8 p-4 pt-20 md:pt-8">
-          {/* Back button container */}
-          <div className="flex justify-center mb-8">
-            <Link 
-              href="/contacts" 
-              className="text-gray-600 hover:text-gray-800 inline-block text-base border border-gray-200 rounded px-4 py-2"
-            >
-              ← Back to Contacts
-            </Link>
-          </div>
-
-          {/* Company header */}
-          <div className="text-center mb-8 max-w-4xl mx-auto">
-            <div className="rounded-lg">
-              <h1 className="text-3xl font-semibold text-gray-800">{companyData?.company || 'Loading...'}</h1>
+        {isLoading ? (
+          <LoadingScreen />
+        ) : (
+          <div className="md:p-8 p-4 pt-20 md:pt-8">
+            {/* Back button container */}
+            <div className="flex justify-center mb-8">
+              <Link 
+                href="/contacts" 
+                className="text-gray-600 hover:text-gray-800 inline-block text-base border border-gray-200 rounded px-4 py-2"
+              >
+                ← Back to Contacts
+              </Link>
             </div>
-          </div>
 
-          <LocationSection 
-            address={companyData?.address} 
-            region={companyData?.region} 
-            companyId={id} 
-          />
-          <ContactSection 
-            contacts={companyData?.details?.contacts || []} 
-            companyId={id}
-            onContactAdded={handleContactAdded}
-            onDeleteContact={handleDeleteContact}
-          />
-          <Table 
-            tools={companyData?.details?.tools_installed || []} 
-            companyId={id} 
-            onDeleteTool={handleDeleteTool}
-          />
-        </div>
+            {/* Company header */}
+            <div className="text-center mb-8 max-w-4xl mx-auto">
+              <div className="rounded-lg">
+                <h1 className="text-3xl font-semibold text-gray-800">{companyData?.company || 'Loading...'}</h1>
+              </div>
+            </div>
+
+            <LocationSection 
+              address={companyData?.address} 
+              region={companyData?.region} 
+              companyId={id} 
+            />
+            <ContactSection 
+              contacts={companyData?.details?.contacts || []} 
+              companyId={id}
+              onContactAdded={handleContactAdded}
+              onDeleteContact={handleDeleteContact}
+            />
+            <Table 
+              tools={companyData?.details?.tools_installed || []} 
+              companyId={id} 
+              onDeleteTool={handleDeleteTool}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

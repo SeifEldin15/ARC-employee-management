@@ -1,8 +1,10 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Sidebar from '@/components/Sidebar'
+import LoadingScreen from '@/components/LoadingScreen'
 
 const Report = () => {
+  const [isLoading, setIsLoading] = useState(true);
   // Change from const to state for number of columns
   const [numberOfColumns, setNumberOfColumns] = useState(3);
   
@@ -80,6 +82,15 @@ const Report = () => {
     }
   }, [])
 
+  // Add loading effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleSubmit = async () => {
     // Format SVR data - now using single SRV for all days
     const svrCategory = days.map(day => ({
@@ -136,111 +147,115 @@ const Report = () => {
   return (
     <div className="min-h-screen bg-[#F5F6FA]">
       <Sidebar />
-      <div className="md:ml-64 pt-20 md:pt-0 ">
-        <div className="p-8 ">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-xl font-normal text-gray-700 mb-8 text-center">Weekly Utilization Report</h1>
-            
-            {/* Date Range Input */}
-            <div className="flex gap-12 mb-8">
-              <div className="flex items-center gap-3">
-                <label className="text-sm text-gray-600">Week Number</label>
-                <input 
-                  type="text" 
-                  value={weekNumber}
-                  readOnly
-                  className="border border-gray-200 rounded px-3 py-1.5 text-sm bg-gray-50" 
-                />
+      <div className="md:ml-64 pt-20 md:pt-0">
+        {isLoading ? (
+          <LoadingScreen />
+        ) : (
+          <div className="p-8">
+            <div className="max-w-7xl mx-auto">
+              <h1 className="text-xl font-normal text-gray-700 mb-8 text-center">Weekly Utilization Report</h1>
+              
+              {/* Date Range Input */}
+              <div className="flex gap-12 mb-8">
+                <div className="flex items-center gap-3">
+                  <label className="text-sm text-gray-600">Week Number</label>
+                  <input 
+                    type="text" 
+                    value={weekNumber}
+                    readOnly
+                    className="border border-gray-200 rounded px-3 py-1.5 text-sm bg-gray-50" 
+                  />
+                </div>
+              </div>
+
+              {/* Report Table */}
+              <div className="bg-[#F8F9FA] rounded-lg shadow">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">Day</th>
+                      <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
+                        <input 
+                          type="text" 
+                          value={srvInput}
+                          onChange={(e) => setSrvInput(e.target.value)}
+                          placeholder="Enter SRV#"
+                          className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white" 
+                        />
+                      </th>
+                      {[...Array(numberOfColumns)].map((_, index) => (
+                        <th key={index} className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
+                          <select className="w-full bg-transparent outline-none">
+                            <option value="">Select Activity</option>
+                            {activities.slice(0, -1).map(activity => (
+                              <option key={activity} value={activity}>{activity}</option>
+                            ))}
+                          </select>
+                        </th>
+                      ))}
+                      <th className="py-3 px-2 w-10">
+                        <button 
+                          onClick={handleAddColumn}
+                          className="p-1 rounded-full bg-blue-500 text-white hover:bg-blue-600"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {days.map((day) => {
+                      const dailyTotal = Object.entries(hourInputs)
+                        .filter(([key]) => key.startsWith(day))
+                        .reduce((sum, [_, value]) => sum + (parseFloat(value) || 0), 0);
+
+                      return (
+                        <tr key={day} className="border-b">
+                          <td className="py-2 px-4 text-sm text-gray-600">{day}</td>
+                          <td className="py-2 px-4 text-sm text-gray-600">{srvInput}</td>
+                          {[...Array(numberOfColumns)].map((_, index) => (
+                            <td key={index} className="py-2 px-4">
+                              <input 
+                                type="number" 
+                                value={hourInputs[`${day}-${index}`] || '0.0'}
+                                onChange={(e) => handleHourInput(day, index, e.target.value)}
+                                min="0"
+                                max="24"
+                                step="0.5"
+                                className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
+                              />
+                            </td>
+                          ))}
+                          <td className="py-2 px-4 text-sm text-gray-600 text-right">{dailyTotal.toFixed(1)}</td>
+                          <td className="py-2 px-2"></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colSpan={numberOfColumns + 3} className="py-3 px-4 text-sm font-medium text-gray-600 text-right">
+                        {totalHours.toFixed(1)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              {/* Submit Button */}
+              <div className="mt-8 flex justify-center">
+                <button 
+                  onClick={handleSubmit}
+                  className="bg-green-500 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-green-600"
+                >
+                  Submit Report
+                </button>
               </div>
             </div>
-
-            {/* Report Table */}
-            <div className="bg-[#F8F9FA] rounded-lg shadow">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">Day</th>
-                    <th className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
-                      <input 
-                        type="text" 
-                        value={srvInput}
-                        onChange={(e) => setSrvInput(e.target.value)}
-                        placeholder="Enter SRV#"
-                        className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white" 
-                      />
-                    </th>
-                    {[...Array(numberOfColumns)].map((_, index) => (
-                      <th key={index} className="py-3 px-4 text-sm font-normal text-gray-600 text-left">
-                        <select className="w-full bg-transparent outline-none">
-                          <option value="">Select Activity</option>
-                          {activities.slice(0, -1).map(activity => (
-                            <option key={activity} value={activity}>{activity}</option>
-                          ))}
-                        </select>
-                      </th>
-                    ))}
-                    <th className="py-3 px-2 w-10">
-                      <button 
-                        onClick={handleAddColumn}
-                        className="p-1 rounded-full bg-blue-500 text-white hover:bg-blue-600"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {days.map((day) => {
-                    const dailyTotal = Object.entries(hourInputs)
-                      .filter(([key]) => key.startsWith(day))
-                      .reduce((sum, [_, value]) => sum + (parseFloat(value) || 0), 0);
-
-                    return (
-                      <tr key={day} className="border-b">
-                        <td className="py-2 px-4 text-sm text-gray-600">{day}</td>
-                        <td className="py-2 px-4 text-sm text-gray-600">{srvInput}</td>
-                        {[...Array(numberOfColumns)].map((_, index) => (
-                          <td key={index} className="py-2 px-4">
-                            <input 
-                              type="number" 
-                              value={hourInputs[`${day}-${index}`] || '0.0'}
-                              onChange={(e) => handleHourInput(day, index, e.target.value)}
-                              min="0"
-                              max="24"
-                              step="0.5"
-                              className="w-full text-sm px-2 py-1 border border-gray-200 rounded bg-white"
-                            />
-                          </td>
-                        ))}
-                        <td className="py-2 px-4 text-sm text-gray-600 text-right">{dailyTotal.toFixed(1)}</td>
-                        <td className="py-2 px-2"></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={numberOfColumns + 3} className="py-3 px-4 text-sm font-medium text-gray-600 text-right">
-                      {totalHours.toFixed(1)}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            {/* Submit Button */}
-            <div className="mt-8 flex justify-center">
-              <button 
-                onClick={handleSubmit}
-                className="bg-green-500 text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-green-600"
-              >
-                Submit Report
-              </button>
-            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

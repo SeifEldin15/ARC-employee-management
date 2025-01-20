@@ -16,14 +16,24 @@ export async function GET(request) {
     const employees = await User.find({ 
       managerId: user._id, 
       role: 'Employee' 
-    }).select("name email");
+    }).select("name email createdAt");
 
     const allWeeks = await Workweek.find()
       .select('weekNumber startDate endDate pendingReports');
 
     const employeeData = await Promise.all(employees.map(async (employee) => {
+      const employeeCreatedDate = new Date(employee.createdAt);
+      const employeeCreatedWeek = Math.ceil(
+        (employeeCreatedDate.getTime() - new Date(employeeCreatedDate.getFullYear(), 0, 1).getTime()) 
+        / (7 * 24 * 60 * 60 * 1000)
+      );
+
       const missingWeeks = allWeeks
         .filter(week => {
+          if (week.weekNumber < employeeCreatedWeek) {
+            return false;
+          }
+          
           const report = week.pendingReports.find(
             report => report.employeeId.toString() === employee._id.toString()
           );

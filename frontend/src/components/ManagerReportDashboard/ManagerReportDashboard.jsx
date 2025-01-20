@@ -78,7 +78,7 @@ export default function ManagerReports() {
       </div>
 
       {/* Monthly Reports Section */}
-      <div>
+      <div className="mb-8">
         <div className="flex items-center gap-2 bg-gray-50 p-4 rounded-t-lg border border-gray-200">
           <IoDocument className="text-blue-500 text-xl" />
           <h2 className="text-gray-900 font-medium">Monthly Reports</h2>
@@ -89,15 +89,18 @@ export default function ManagerReports() {
             <thead>
               <tr>
                 <td className="p-4">
-                  <div className="flex flex-col items-center text-center">
-                    <div>
+                  <div className="flex flex-col sm:flex-row justify-between items-center">
+                    <div className="sm:flex-1" />
+                    <div className="text-center sm:flex-1">
                       <div className="text-sm text-gray-500">CURRENT MONTH</div>
                       <div className="text-gray-700">December 2024</div>
                     </div>
-                    <button className="flex items-center gap-2 text-blue-500 text-sm hover:text-blue-600 mt-2">
-                      <FaFileDownload />
-                      Not Available
-                    </button>
+                    <div className="sm:flex-1 flex justify-center sm:justify-end mt-2 sm:mt-0">
+                      <button className="flex items-center gap-2 text-blue-500 text-sm hover:text-blue-600">
+                        <FaFileDownload />
+                        Download PDF
+                      </button>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -118,20 +121,23 @@ export default function ManagerReports() {
                 },
                 {
                   month: 'October 2024',
-                  generated: 'Generated on October 3, 2024'
+                  generated: 'Generated on October 1, 2024'
                 }
               ].map((report, index) => (
                 <tr key={index}>
                   <td className="p-4 border-b border-gray-200">
-                    <div className="flex flex-col items-center">
-                      <div className="text-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-center">
+                      <div className="sm:flex-1" />
+                      <div className="text-center sm:flex-1">
                         <div className="text-gray-700">{report.month}</div>
                         <div className="text-sm text-gray-400">{report.generated}</div>
                       </div>
-                      <button className="flex items-center gap-2 text-blue-500 text-sm hover:text-blue-600 mt-2">
-                        <FaFileDownload />
-                        Download
-                      </button>
+                      <div className="sm:flex-1 flex justify-center sm:justify-end mt-2 sm:mt-0">
+                        <button className="flex items-center gap-2 text-blue-500 text-sm hover:text-blue-600">
+                          <FaFileDownload />
+                          Download
+                        </button>
+                      </div>
                     </div>
                   </td>
                 </tr>

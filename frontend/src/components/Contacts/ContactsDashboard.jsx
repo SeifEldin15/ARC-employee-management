@@ -162,7 +162,7 @@ const ContactsDashboard = () => {
                   <td className="px-6 py-4 text-sm text-gray-900">{contact.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{contact.email}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{contact.phone}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{contact.role}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{contact.role || 'N/A'}</td>
                 </tr>
               ))}
             </tbody>

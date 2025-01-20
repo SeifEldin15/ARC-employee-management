@@ -13,22 +13,19 @@ export async function GET(request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch the user from the database to get the createdAt date
     const userData = await User.findById(user._id).select('createdAt');
     if (!userData) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Get the user's creation date and week number
     const userCreatedDate = new Date(userData.createdAt);
     const userCreatedWeek = Math.ceil((userCreatedDate.getTime() - new Date(userCreatedDate.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));    
     const workweeks = await Workweek.find({
-      weekNumber: { $gte: userCreatedWeek } // Only get weeks from user's creation week onwards
+      weekNumber: { $gte: userCreatedWeek } 
     })
     .sort({ weekNumber: 1 })
     .distinct('weekNumber');
 
-    // Get complete workweek documents for the unique week numbers
     const uniqueWorkweeks = await Workweek.find({
       weekNumber: { $in: workweeks }
     }).sort({ weekNumber: 1 });

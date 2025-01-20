@@ -23,6 +23,10 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
+    if(!data.weekNumber ){
+      return NextResponse.json({ message: 'Week number is required.' }, { status: 400 });
+    }
+
     const csr = new CSR({
       employeeId,
       ...data,

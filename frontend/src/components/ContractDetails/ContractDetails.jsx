@@ -30,35 +30,42 @@ const ContractDetails = () => {
           return
         }
 
-        // Fetch both contract and visits data
-        const [contractResponse, visitsResponse] = await Promise.all([
-          fetch(`/api/contract/${id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            }
-          }),
-          fetch(`/api/contract/visits/${id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json',
-            }
-          })
-        ])
+        // First fetch contract data
+        const contractResponse = await fetch(`/api/contract/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          }
+        });
 
-        if (!contractResponse.ok || !visitsResponse.ok) {
-          if (contractResponse.status === 401 || visitsResponse.status === 401) {
+        if (!contractResponse.ok) {
+          if (contractResponse.status === 401) {
             window.location.href = '/'
             return
           }
-          throw new Error('Failed to fetch data')
+          throw new Error('Failed to fetch contract data')
         }
 
-        const [contractData, visitsData] = await Promise.all([
-          contractResponse.json(),
-          visitsResponse.json()
-        ])
+        const contractData = await contractResponse.json()
+
+        // Then fetch visits using the srvNumber from contract
+        const visitsResponse = await fetch(`/api/contract/visits/${contractData.contract.srvNumber}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          }
+        });
+
+        if (!visitsResponse.ok) {
+          if (visitsResponse.status === 401) {
+            window.location.href = '/'
+            return
+          }
+          throw new Error('Failed to fetch visits data')
+        }
+
+        const visitsData = await visitsResponse.json()
 
         setContract({
           ...contractData.contract,

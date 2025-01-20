@@ -41,14 +41,7 @@ const ContactSection = ({ contacts, companyId, onContactAdded, onDeleteContact, 
 
       if (response.ok) {
         const newContact = await response.json();
-        const formattedContact = {
-          _id: newContact._id,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          role: formData.role
-        };
-        onContactAdded(formattedContact);
+        onContactAdded(newContact);
         setShowModal(false);
         setFormData({ name: '', email: '', phone: '', role: '' });
       } else {

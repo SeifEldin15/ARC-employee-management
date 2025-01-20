@@ -19,6 +19,7 @@ const ManagerContacts = () => {
     endDate: '',
     serviceType: 'Service'
   });
+  const [companies, setCompanies] = useState([]);
 
   // First useEffect to get token after component mounts
   useEffect(() => {
@@ -69,10 +70,36 @@ const ManagerContacts = () => {
     }
   };
 
-  // Second useEffect to fetch data once we have the token
+  // Add function to fetch companies
+  const fetchCompanies = async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch('/api/company', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCompanies(data);
+      }
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+    }
+  };
+
+  // Update second useEffect to fetch both contracts and companies
   useEffect(() => {
-    fetchContracts();
-  }, [token]); // Only run when token changes
+    if (token) {
+      fetchContracts();
+      fetchCompanies();
+    }
+  }, [token]);
 
   const getProgressColor = (percentage) => {
     if (percentage >= 70) return 'bg-emerald-500'
@@ -188,13 +215,19 @@ const ManagerContacts = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Company Name</label>
-                        <input
-                          type="text"
+                        <select
                           value={formData.customer}
                           onChange={(e) => setFormData({...formData, customer: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
-                        />
+                        >
+                          <option value="">Select a company</option>
+                          {companies.map((company) => (
+                            <option key={company._id} value={company.name}>
+                              {company.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Contact Name</label>
@@ -202,7 +235,7 @@ const ManagerContacts = () => {
                           type="text"
                           value={formData.contactName}
                           onChange={(e) => setFormData({...formData, contactName: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         />
                       </div>
@@ -212,7 +245,7 @@ const ManagerContacts = () => {
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         />
                       </div>
@@ -222,7 +255,7 @@ const ManagerContacts = () => {
                           type="tel"
                           value={formData.phone}
                           onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         />
                       </div>
@@ -232,7 +265,7 @@ const ManagerContacts = () => {
                           type="text"
                           value={formData.address}
                           onChange={(e) => setFormData({...formData, address: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         />
                       </div>
@@ -242,7 +275,7 @@ const ManagerContacts = () => {
                           type="text"
                           value={formData.srvNumber}
                           onChange={(e) => setFormData({...formData, srvNumber: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         />
                       </div>
@@ -252,7 +285,7 @@ const ManagerContacts = () => {
                           type="number"
                           value={formData.contractHours}
                           onChange={(e) => setFormData({...formData, contractHours: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         />
                       </div>
@@ -262,7 +295,7 @@ const ManagerContacts = () => {
                           type="date"
                           value={formData.startDate}
                           onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         />
                       </div>
@@ -272,7 +305,7 @@ const ManagerContacts = () => {
                           type="date"
                           value={formData.endDate}
                           onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         />
                       </div>
@@ -281,7 +314,7 @@ const ManagerContacts = () => {
                         <select
                           value={formData.serviceType}
                           onChange={(e) => setFormData({...formData, serviceType: e.target.value})}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-md border-2 border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                           required
                         >
                           <option value="Service">Service</option>
@@ -294,7 +327,7 @@ const ManagerContacts = () => {
                       <button
                         type="button"
                         onClick={() => setIsModalOpen(false)}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                        className="px-4 py-2 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50"
                       >
                         Cancel
                       </button>

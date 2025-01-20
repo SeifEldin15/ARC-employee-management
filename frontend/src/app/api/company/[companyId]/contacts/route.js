@@ -14,7 +14,7 @@ export async function POST(request, { params }) {
     }
     company.contacts.push({ name, email, phone, role });
     await company.save();
-    return NextResponse.json(company, { status: 201 });
+    return NextResponse.json(company.contacts[company.contacts.length - 1], { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: 'Error adding contact', error: error.message }, { status: 500 });
   }

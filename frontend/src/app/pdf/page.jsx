@@ -21,7 +21,7 @@ const hideSpinButtons = {
 }
 
 export default function CustomerServiceReport() {
-  // Add state management
+  const [companies, setCompanies] = useState([])
   const [formData, setFormData] = useState({
     srvNumber: '',
     serviceEngineer: '',
@@ -121,6 +121,45 @@ export default function CustomerServiceReport() {
     }
   }, []);
 
+  // Add useEffect to get user info
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('/api/auth/info', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        setFormData(prev => ({
+          ...prev,
+          serviceEngineer: response.data.name
+        }));
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+        setError('Failed to fetch user information');
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  // Add useEffect to fetch companies
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get('/api/company')
+        setCompanies(response.data)
+      } catch (error) {
+        console.error('Error fetching companies:', error)
+        setError('Failed to fetch companies')
+      }
+    }
+
+    fetchCompanies()
+  }, [])
+
   // Add handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -162,6 +201,25 @@ export default function CustomerServiceReport() {
       })
     }));
   };
+
+  // Update company selection handler to allow editing of all fields
+  const handleCompanyChange = (e) => {
+    const selectedCompanyId = e.target.value
+    const selectedCompany = companies.find(company => company._id === selectedCompanyId)
+    
+    if (selectedCompany) {
+      // Pre-fill all fields but keep them editable
+      setFormData(prev => ({
+        ...prev,
+        companyId: selectedCompany._id,
+        customer: selectedCompany.name,
+        address: selectedCompany.address,
+        contact: '',
+        email: '',
+        mobileNumber: ''
+      }))
+    }
+  }
 
   // Update form submit handler
   const handleSubmit = async (e) => {
@@ -237,7 +295,7 @@ export default function CustomerServiceReport() {
             {/* Header */}
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold mb-2">CUSTOMER SERVICE REPORT</h1>
-              <p className="text-sm text-gray-600">TECH LINK Sr. Lt. (Hamburg) St. 34756, tel 07/57/77999 p 048-286-4550</p>
+              {/* <p className="text-sm text-gray-600">TECH LINK Sr. Lt. (Hamburg) St. 34756, tel 07/57/77999 p 048-286-4550</p> */}
             </div>
 
             {/* Top Section Grid */}
@@ -255,6 +313,21 @@ export default function CustomerServiceReport() {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium">Select Company*</label>
+                  <select
+                    onChange={handleCompanyChange}
+                    className="mt-1 block w-full border rounded-md px-3 py-2"
+                    required
+                  >
+                    <option value="">Select a company</option>
+                    {companies.map(company => (
+                      <option key={company._id} value={company._id}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm font-medium">Customer*</label>
                   <input 
                     type="text"
@@ -262,7 +335,7 @@ export default function CustomerServiceReport() {
                     value={formData.customer}
                     onChange={handleInputChange}
                     className="mt-1 block w-full border rounded-md px-3 py-2"
-                    required 
+                    required
                   />
                 </div>
                 <div>
@@ -272,7 +345,7 @@ export default function CustomerServiceReport() {
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full border rounded-md px-3 py-2" 
+                    className="mt-1 block w-full border rounded-md px-3 py-2"
                   />
                 </div>
                 <div>
@@ -282,7 +355,7 @@ export default function CustomerServiceReport() {
                     name="contact"
                     value={formData.contact}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full border rounded-md px-3 py-2" 
+                    className="mt-1 block w-full border rounded-md px-3 py-2"
                   />
                 </div>
                 <div>
@@ -292,7 +365,7 @@ export default function CustomerServiceReport() {
                     name="mobileNumber"
                     value={formData.mobileNumber}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full border rounded-md px-3 py-2" 
+                    className="mt-1 block w-full border rounded-md px-3 py-2"
                   />
                 </div>
                 <div>
@@ -302,7 +375,7 @@ export default function CustomerServiceReport() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full border rounded-md px-3 py-2" 
+                    className="mt-1 block w-full border rounded-md px-3 py-2"
                   />
                 </div>
               </div>
@@ -314,9 +387,9 @@ export default function CustomerServiceReport() {
                     type="text"
                     name="serviceEngineer"
                     value={formData.serviceEngineer}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full border rounded-md px-3 py-2"
+                    className="mt-1 block w-full border rounded-md px-3 py-2 bg-gray-100"
                     required 
+                    readOnly
                   />
                 </div>
                 <div>

@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     phone: { type: String },
     managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    createdAt: { type: Date, default: Date.now },
 });
 
 // Check if model exists before creating

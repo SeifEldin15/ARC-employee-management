@@ -1,69 +1,104 @@
-'use client';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
+import { useEffect, useState, useRef } from 'react';
 const VerticalDistribution = () => {
-  const [reportData, setReportData] = useState([]);
-
+  const [isClient, setIsClient] = useState(false);
+  const [animatedData, setAnimatedData] = useState([]);
+  const [dimensions, setDimensions] = useState({ width: 600, height: 250 });
+  const containerRef = useRef(null);
+  
+  const data = [
+    { name: 'Jan', value: 85, color: '#FF4D8F' },
+    { name: 'Feb', value: 82, color: '#4D79FF' },
+    { name: 'Mar', value: 88, color: '#FFB84D' },
+    { name: 'Apr', value: 87, color: '#4DFFED' },
+    { name: 'May', value: 90, color: '#FF8A4D' },
+    { name: 'Jun', value: 93, color: '#4DFF5C' },
+  ];
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/api/dashboard/employee/data');
-        setReportData(response.data.reportSummary);
-      } catch (error) {
-        console.error('Error fetching report data:', error);
+    setIsClient(true);
+    
+    const handleResize = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth;
+        setDimensions({
+          width: Math.max(width - 40, 200),
+          height: 250
+        });
       }
     };
-    fetchData();
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    
+    return <div className="w-full  bg-white rounded-lg shadow-md border">Loading...</div>;  }, []);
+  useEffect(() => {
+    // Animate bars gradually
+    const animateData = () => {
+      const steps = 20;
+      let currentStep = 0;
+      const interval = setInterval(() => {
+        currentStep++;
+        const progress = currentStep / steps;
+        
+        const currentData = data.map(item => ({
+          ...item,
+          value: Math.floor(item.value * progress)
+        }));
+        
+        setAnimatedData(currentData);
+        if (currentStep === steps) {
+          clearInterval(interval);
+        }
+      }, 50);
+      return () => clearInterval(interval);
+    };
+    animateData();
   }, []);
-
-  // Helper function to determine cell color based on reports submitted
-  const getCellColor = (reportsSubmitted) => {
-    if (reportsSubmitted === 0) return 'bg-gray-100';
-    if (reportsSubmitted <= 2) return 'bg-green-100';
-    if (reportsSubmitted <= 5) return 'bg-green-300';
-    return 'bg-green-500';
-  };
-
-  // Generate weeks array for the year
-  const generateWeeksArray = () => {
-    const weeks = [];
-    for (let i = 1; i <= 52; i++) {
-      const existingData = reportData.find(data => data.week === i);
-      weeks.push({
-        week: i,
-        reportsSubmitted: existingData ? existingData.reportsSubmitted : 0
-      });
-    }
-    return weeks;
-  };
-
+  if (!isClient) {
+    return <div className="w-full p-6 bg-white rounded-lg shadow-md border">Loading...</div>;
+  }
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4">Reports Contribution History</h2>
-      <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-52 gap-1">
-          {generateWeeksArray().map((weekData, index) => (
-            <div
-              key={index}
-              className={`w-4 h-4 rounded-sm ${getCellColor(weekData.reportsSubmitted)} hover:ring-2 hover:ring-gray-400`}
-              title={`Week ${weekData.week}: ${weekData.reportsSubmitted} reports`}
-            />
-          ))}
-        </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>Less</span>
-          <div className="flex gap-1">
-            <div className="w-4 h-4 bg-gray-100 rounded-sm" />
-            <div className="w-4 h-4 bg-green-100 rounded-sm" />
-            <div className="w-4 h-4 bg-green-300 rounded-sm" />
-            <div className="w-4 h-4 bg-green-500 rounded-sm" />
-          </div>
-          <span>More</span>
-        </div>
+    <div className="w-full p-4 bg-white rounded-lg shadow-md border" ref={containerRef}>
+      <h2 className="text-xl font-medium text-gray-700 mb-4 text-center">
+        Utilization Trend
+      </h2>
+      
+      <div className="w-full overflow-x-auto">
+        <BarChart
+          width={dimensions.width}
+          height={dimensions.height}
+          data={animatedData}
+          margin={{ top: 5, right: 0, left: 0, bottom: 20 }}
+        >
+          <XAxis 
+            dataKey="name" 
+            axisLine={false}
+            tickLine={false}
+            stroke="#94a3b8"
+            fontSize={12}
+          />
+          <YAxis 
+            type="number"
+            unit="%" 
+            axisLine={false}
+            tickLine={false}
+            stroke="#94a3b8"
+            fontSize={12}
+            domain={[0, 100]}
+          />
+          <Tooltip />
+          <Bar
+            dataKey="value"
+            animationDuration={0}
+            radius={[3, 3, 0, 0]}
+            barSize={20}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Bar>
+        </BarChart>
       </div>
     </div>
   );
 };
-
 export default VerticalDistribution;

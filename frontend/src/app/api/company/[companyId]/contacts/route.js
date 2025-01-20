@@ -28,7 +28,6 @@ export async function POST(request, { params }) {
     company.contacts.push({ name, email, phone, role });
     await company.save();
 
-
     return NextResponse.json({ message: 'Contact added successfully' }, { status: 201 });
   } catch (error) {
     console.error('Error in POST /company/:companyId/contacts:', error);

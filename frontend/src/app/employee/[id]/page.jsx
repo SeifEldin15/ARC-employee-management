@@ -25,7 +25,7 @@ export default function DashboardPage() {
         ) : (
           <>
             <div className="md:p-8 p-4 pt-20 md:pt-8">
-              <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+              <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <ActivityRects 
                   value="92%" 
                   subLabel="+2%" 
@@ -52,7 +52,7 @@ export default function DashboardPage() {
                 />
               </main>
             </div>
-            <div className="md:p-8 p-4 pt-20 md:pt-8">
+            <div className="md:p-8 p-4">
               <EmployeeDashboard />
             </div>
           </>

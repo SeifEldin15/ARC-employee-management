@@ -83,11 +83,11 @@ const EmployeeDashboard = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 sm:p-6">
+    <div className="p-4 sm:p-6">
       <h1 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-4 sm:mb-6">Work Weeks History</h1>
       
       <div className="bg-white rounded-lg shadow-md overflow-x-auto">
-        <div className="min-w-[768px] grid grid-cols-12 p-4 border-b bg-gray-50">
+        <div className="grid grid-cols-12 p-4 border-b bg-gray-50">
           <div className="text-sm text-gray-600 col-span-2">Week</div>
           <div className="text-sm text-gray-600 col-span-2">Date Range</div>
           <div className="text-sm text-gray-600 col-span-2">Utilization</div>
@@ -98,7 +98,7 @@ const EmployeeDashboard = () => {
         {workWeeks.map((week, index) => (
           <div 
             key={week.week} 
-            className="min-w-[768px] grid grid-cols-12 p-4 border-b last:border-b-0 items-center"
+            className="grid grid-cols-12 p-4 border-b last:border-b-0 items-center"
           >
             <div className="col-span-2 text-sm text-gray-900">{week.week}</div>
             <div className="col-span-2 text-sm text-gray-900">{week.dateRange}</div>

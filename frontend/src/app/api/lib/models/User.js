@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     job_title: { type: String, default: 'Employee' },
     email: { type: String, required: true, unique: true },
     phone: { type: String },
-    managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
 // Check if model exists before creating

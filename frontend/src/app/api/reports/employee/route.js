@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/app/api/lib/db';
 import Workweek from '@/app/api/lib/models/workweek';
+import User from '@/app/api/lib/models/User';
 import { verifyAuth } from '@/app/api/lib/auth';
 
 export async function GET(request) {
@@ -12,9 +13,20 @@ export async function GET(request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
+    // Fetch the user from the database to get the createdAt date
+    const userData = await User.findById(user._id).select('createdAt');
+    if (!userData) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
+
+    // Get the user's creation date
+    const userCreatedDate = new Date(userData.createdAt);
+
     const workweeks = await Workweek.find({}).sort({ weekNumber: 1 });
 
-    const reports = workweeks.map((week) => {
+    const filteredWorkweeks = workweeks.filter(week => new Date(week.startDate) >= userCreatedDate);
+
+    const reports = filteredWorkweeks.map((week) => {
       const employeeReport = week.pendingReports.find(
         (report) => report.employeeId?.toString() === user._id.toString()
       );

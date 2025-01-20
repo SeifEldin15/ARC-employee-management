@@ -19,14 +19,21 @@ export async function GET(request) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Get the user's creation date
+    // Get the user's creation date and week number
     const userCreatedDate = new Date(userData.createdAt);
+    const userCreatedWeek = Math.ceil((userCreatedDate.getTime() - new Date(userCreatedDate.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));    
+    const workweeks = await Workweek.find({
+      weekNumber: { $gte: userCreatedWeek } // Only get weeks from user's creation week onwards
+    })
+    .sort({ weekNumber: 1 })
+    .distinct('weekNumber');
 
-    const workweeks = await Workweek.find({}).sort({ weekNumber: 1 });
+    // Get complete workweek documents for the unique week numbers
+    const uniqueWorkweeks = await Workweek.find({
+      weekNumber: { $in: workweeks }
+    }).sort({ weekNumber: 1 });
 
-    const filteredWorkweeks = workweeks.filter(week => new Date(week.startDate) >= userCreatedDate);
-
-    const reports = filteredWorkweeks.map((week) => {
+    const reports = uniqueWorkweeks.map((week) => {
       const employeeReport = week.pendingReports.find(
         (report) => report.employeeId?.toString() === user._id.toString()
       );

@@ -4,7 +4,7 @@ import Sidebar from '@/components/Sidebar';
 import EmployeeDashboard from '@/components/Employee/EmployeeDashboard';
 import ActivityRects from '@/components/Dashboard Main/ActivityRects';
 import LoadingScreen from '@/components/LoadingScreen';
-
+import Heatmap from '@/components/Employee/Heatmap';
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,6 +51,10 @@ export default function DashboardPage() {
                   color="#2196F3"
                 />
               </main>
+            </div>
+            <div className="md:p-10 p-4">
+              <h1 className="text-2xl font-bold text-gray-700 mb-4">Work Volume</h1>
+              <Heatmap />
             </div>
             <div className="md:p-8 p-4">
               <EmployeeDashboard />

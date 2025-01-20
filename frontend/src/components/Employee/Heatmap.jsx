@@ -15,7 +15,11 @@ const Heatmap = ({ data }) => {
   const weekDays = ['Mon', 'Wed', 'Fri'];
 
   // Generate months
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'];
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 
+    'Jan-next'  // Changed to make the key unique
+  ];
 
   // Generate dummy data for demonstration
   const generateDummyData = () => {

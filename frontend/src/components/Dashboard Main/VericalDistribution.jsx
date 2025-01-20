@@ -26,10 +26,13 @@ const VerticalDistribution = () => {
         });
       }
     };
+    
     handleResize();
     window.addEventListener('resize', handleResize);
     
-    return <div className="w-full  bg-white rounded-lg shadow-md border">Loading...</div>;  }, []);
+    // Return cleanup function
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   useEffect(() => {
     // Animate bars gradually
     const animateData = () => {

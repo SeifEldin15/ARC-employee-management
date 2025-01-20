@@ -43,12 +43,17 @@ const ManagerReports = () => {
 
   const handleReminder = async (employee, weekInfo) => {
     try {
-      // Extract just the week number from the date string without adding "WW"
-      const weekNumber = weekInfo.date.split(' ')[0]; // This will give us just the number
+      // Extract just the week number from the date string and add "WW" prefix
+      const weekNumber = 'WW' + weekInfo.date.split(' ')[0]; // This will give us "WW4" format
+      
+      console.log('Sending reminder for:', {
+        employeeEmail: employee.email,
+        missingWeek: weekNumber
+      });
 
-      await axios.post('http://localhost:5000/api/reminder/send-reminder', {
-        email: employee.email,
-        missingWeekS: weekNumber  // Send just the number, let backend add "WW"
+      await axios.post('http://localhost:3000/api/email/send-reminder', {
+        employeeEmail: employee.email,
+        missingWeek: weekNumber
       }, {
         withCredentials: true,
         headers: {

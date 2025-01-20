@@ -70,7 +70,7 @@ const ManagerReports = () => {
 
   return (
     <div className="p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className=" mx-auto">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Missing Utilization Reports</h1>
         <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">Showing reports for the last 4 work weeks</p>
         

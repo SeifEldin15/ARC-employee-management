@@ -219,7 +219,7 @@ const Report = () => {
                             <td key={index} className="py-2 px-4">
                               <input 
                                 type="number" 
-                                value={hourInputs[`${day}-${index}`] || '0.0'}
+                                value={hourInputs[`${day}-${index}`] || ''}
                                 onChange={(e) => handleHourInput(day, index, e.target.value)}
                                 min="0"
                                 max="24"

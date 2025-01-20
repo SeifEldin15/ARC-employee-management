@@ -7,22 +7,32 @@ const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [role, setRole] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch user info when component mounts
     const fetchUserInfo = async () => {
       try {
+        setLoading(true);
         const response = await fetch('/api/auth/info');
         const data = await response.json();
         setUserInfo(data);
         setRole(data.role);
       } catch (error) {
         console.error('Error fetching user info:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserInfo();
   }, []);
+
+  const SkeletonItem = () => (
+    <div className="flex items-center space-x-2 px-3 py-2 rounded-md">
+      <div className="w-5 h-5 bg-gray-700 rounded animate-pulse"></div>
+      <div className="h-4 w-24 bg-gray-700 rounded animate-pulse"></div>
+    </div>
+  );
 
   const menuItems = [
     { 
@@ -75,7 +85,9 @@ const Sidebar = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                {userInfo?.image ? (
+                {loading ? (
+                  <div className="w-full h-full rounded-full bg-gray-700 animate-pulse" />
+                ) : userInfo?.image ? (
                   <img 
                     src={userInfo.image}
                     alt="Profile" 
@@ -100,24 +112,30 @@ const Sidebar = () => {
         {isMenuOpen && (
           <div className="absolute w-full bg-gray-900">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {menuItems.map((item) => (
-                <Link 
-                  key={item.title}
-                  href={item.href}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-800 hover:text-white transition-colors text-sm"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span>{item.icon}</span>
-                  <span>{item.title}</span>
-                </Link>
-              ))}
-              <button 
-                className="flex items-center space-x-2 px-3 py-2 w-full rounded-md hover:bg-gray-800 hover:text-white transition-colors text-sm"
-                onClick={handleLogout}
-              >
-                <MdLogout className="text-lg" />
-                <span>Logout</span>
-              </button>
+              {loading ? (
+                [...Array(4)].map((_, i) => <SkeletonItem key={i} />)
+              ) : (
+                <>
+                  {menuItems.map((item) => (
+                    <Link 
+                      key={item.title}
+                      href={item.href}
+                      className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-800 hover:text-white transition-colors text-sm"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span>{item.icon}</span>
+                      <span>{item.title}</span>
+                    </Link>
+                  ))}
+                  <button 
+                    className="flex items-center space-x-2 px-3 py-2 w-full rounded-md hover:bg-gray-800 hover:text-white transition-colors text-sm"
+                    onClick={handleLogout}
+                  >
+                    <MdLogout className="text-lg" />
+                    <span>Logout</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -128,7 +146,9 @@ const Sidebar = () => {
         <div className="p-4">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-              {userInfo?.image ? (
+              {loading ? (
+                <div className="w-full h-full rounded-full bg-gray-700 animate-pulse" />
+              ) : userInfo?.image ? (
                 <img 
                   src={userInfo.image}
                   alt="Profile" 
@@ -139,23 +159,36 @@ const Sidebar = () => {
               )}
             </div>
             <div>
-              <h3 className="text-white text-sm font-medium">{userInfo?.name || 'Loading...'}</h3>
-              <p className="text-xs text-gray-500">{userInfo?.job_title || 'Employee'}</p>
+              {loading ? (
+                <>
+                  <div className="h-4 w-24 bg-gray-700 rounded animate-pulse mb-1"></div>
+                  <div className="h-3 w-20 bg-gray-700 rounded animate-pulse"></div>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-white text-sm font-medium">{userInfo?.name || 'Loading...'}</h3>
+                  <p className="text-xs text-gray-500">{userInfo?.job_title || 'Employee'}</p>
+                </>
+              )}
             </div>
           </div>
         </div>
 
         <div className="flex-1 flex flex-col gap-1 p-4">
-          {menuItems.map((item) => (
-            <Link 
-              key={item.title}
-              href={item.href}
-              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-800 hover:text-white transition-colors text-sm"
-            >
-              <span>{item.icon}</span>
-              <span>{item.title}</span>
-            </Link>
-          ))}
+          {loading ? (
+            [...Array(4)].map((_, i) => <SkeletonItem key={i} />)
+          ) : (
+            menuItems.map((item) => (
+              <Link 
+                key={item.title}
+                href={item.href}
+                className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-800 hover:text-white transition-colors text-sm"
+              >
+                <span>{item.icon}</span>
+                <span>{item.title}</span>
+              </Link>
+            ))
+          )}
         </div>
 
         <div className="p-4">

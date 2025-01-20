@@ -39,7 +39,11 @@ const Sidebar = () => {
       { title: 'Weekly Utilization', icon: <MdTimeline className="text-xl md:text-lg" />, href: '/Report' },
       { title: 'Customer Service', icon: <MdSupportAgent className="text-xl md:text-lg" />, href: '/Pdf' },
     ] : []),
-    { title: 'Reports', icon: <MdDescription className="text-xl md:text-lg" />, href: '/Myreports' },
+    { 
+      title: 'Reports', 
+      icon: <MdDescription className="text-xl md:text-lg" />, 
+      href: role === 'Manager' ? '/Managerreports' : '/Myreports' 
+    },
     ...(role === 'Manager' ? [
       {
         title: 'Team',
